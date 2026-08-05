@@ -1,0 +1,11 @@
+@FinanceHub.Api_HostAddress = https://localhost:7095
+
+### Cadastrar usuário
+POST {{FinanceHub.Api_HostAddress}}/api/usuarios
+Content-Type: application/json
+
+{
+  "nome": "Igor",
+  "email": "igor@gmail.com",
+  "senha": "123456"
+}
