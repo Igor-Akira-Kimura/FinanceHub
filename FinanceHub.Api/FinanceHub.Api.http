@@ -1,10 +1,21 @@
 @FinanceHub.Api_HostAddress = http://localhost:5009
 
+### Buscar todos os usuários
+GET {{FinanceHub.Api_HostAddress}}/api/usuarios
+
+###
+
+### Buscar usuário por ID
+GET {{FinanceHub.Api_HostAddress}}/api/usuarios/11111111-1111-1111-1111-111111111111
+
+###
+
+### Cadastrar usuário
 POST {{FinanceHub.Api_HostAddress}}/api/usuarios
 Content-Type: application/json
 
 {
-    "nome": "",
-    "email": "abc",
-    "senha": "1"
+    "nome": "Igor",
+    "email": "igor@email.com",
+    "senha": "123456"
 }

@@ -1,6 +1,7 @@
 ﻿using FinanceHub.Api.Domain.Entities;
 using FinanceHub.Api.Interfaces.Services;
 using FinanceHub.Api.Requests;
+using FinanceHub.Api.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceHub.Api.Controllers
@@ -17,9 +18,11 @@ namespace FinanceHub.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult Teste()
+        public async Task<IActionResult> BuscarTodos()
         {
-            return Ok("API funcionando!");
+            var response = await _usuarioService.BuscarTodosAsync();
+
+            return Ok(response);
         }
 
         [HttpPost]
@@ -28,6 +31,14 @@ namespace FinanceHub.Api.Controllers
             var response = await _usuarioService.CadastrarAsync(request);
 
             return Created($"/api/usuarios/{response.Id}", response);
+        }
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> BuscarPorId(Guid id)
+        {
+            var response = await _usuarioService.BuscarPorIdAsync(id);
+
+            return Ok(response);
         }
     }
 }
