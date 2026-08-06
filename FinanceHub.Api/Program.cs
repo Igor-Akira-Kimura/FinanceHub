@@ -3,6 +3,8 @@ using FinanceHub.Api.Repositories;
 using FinanceHub.Api.Repositories.Interfaces;
 using FinanceHub.Api.Services;
 using FinanceHub.Api.Services.Interfaces;
+using FinanceHub.Api.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinanceHub.Api
 {
@@ -23,6 +25,13 @@ namespace FinanceHub.Api
 
             // DI Repositories
             builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+
+            // DI DbContext
+            builder.Services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
 
             var app = builder.Build();
 
