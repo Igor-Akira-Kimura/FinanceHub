@@ -1,5 +1,6 @@
 ﻿using FinanceHub.Api.Domain.Entities;
 using FinanceHub.Api.Requests;
+using FinanceHub.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceHub.Api.Controllers
@@ -8,6 +9,13 @@ namespace FinanceHub.Api.Controllers
     [Route("api/[controller]")]
     public class UsuariosController : ControllerBase
     {
+        private readonly IUsuarioService _usuarioService;
+        
+        public UsuariosController(IUsuarioService usuarioService)
+        {
+            _usuarioService = usuarioService;
+        }
+
         [HttpGet]
         public IActionResult Teste()
         {
@@ -15,15 +23,11 @@ namespace FinanceHub.Api.Controllers
         }
 
         [HttpPost]
-        public IActionResult Cadastrar(CriarUsuarioRequest request)
+        public async Task<IActionResult> Cadastrar(CriarUsuarioRequest request)
         {
-            var usuario = new Usuario(
-                request.Nome,
-                request.Email,
-                request.Senha // depois vamos gerar o Hash
-            );
+            var response = await _usuarioService.CadastrarAsync(request);
 
-            return Created($"/api/usuarios/{usuario.Id}", usuario);
+            return Created($"/api/usuarios/{response.Id}", response);
         }
     }
 }
