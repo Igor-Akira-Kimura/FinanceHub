@@ -5,6 +5,8 @@ using FinanceHub.Api.Interfaces.Services;
 using FinanceHub.Api.Middlewares;
 using FinanceHub.Api.Repositories;
 using FinanceHub.Api.Services;
+using FinanceHub.Api.Validators;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceHub.Api
@@ -15,7 +17,7 @@ namespace FinanceHub.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.AddValidatorsFromAssemblyContaining<CriarUsuarioRequestValidator>();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

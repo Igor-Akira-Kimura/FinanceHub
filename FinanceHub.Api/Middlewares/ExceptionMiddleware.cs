@@ -1,4 +1,5 @@
 ﻿using FinanceHub.Api.Domain.Exceptions;
+using FluentValidation;
 using System.Text.Json;
 
 namespace FinanceHub.Api.Middlewares
@@ -20,6 +21,26 @@ namespace FinanceHub.Api.Middlewares
             }
             catch (Exception ex)
             {
+                if (ex is ValidationException validationException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    context.Response.ContentType = "application/json";
+
+                    var errors = validationException.Errors
+                        .GroupBy(e => e.PropertyName)
+                        .ToDictionary(
+                            g => g.Key,
+                            g => g.Select(e => e.ErrorMessage).ToArray());
+
+                    await context.Response.WriteAsync(
+                        JsonSerializer.Serialize(new
+                        {
+                            errors
+                        }));
+
+                    return;
+                }
+
                 if (ex is EmailJaCadastradoException)
                 {
                     context.Response.StatusCode = StatusCodes.Status409Conflict;
