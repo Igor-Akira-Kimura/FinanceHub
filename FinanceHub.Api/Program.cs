@@ -1,4 +1,9 @@
 
+using FinanceHub.Api.Repositories;
+using FinanceHub.Api.Repositories.Interfaces;
+using FinanceHub.Api.Services;
+using FinanceHub.Api.Services.Interfaces;
+
 namespace FinanceHub.Api
 {
     public class Program
@@ -12,6 +17,12 @@ namespace FinanceHub.Api
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            // DI Services
+            builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+
+            // DI Repositories
+            builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
             var app = builder.Build();
 
