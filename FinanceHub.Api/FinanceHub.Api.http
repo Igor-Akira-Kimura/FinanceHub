@@ -4,7 +4,7 @@ POST {{FinanceHub.Api_HostAddress}}/api/usuarios
 Content-Type: application/json
 
 {
-  "nome": "Igor",
-  "email": "igor@email.com",
-  "senha": "123456"
+    "nome": "",
+    "email": "abc",
+    "senha": "1"
 }
