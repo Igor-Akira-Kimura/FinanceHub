@@ -1,8 +1,9 @@
 ﻿using FinanceHub.Api.Domain.Entities;
-using FinanceHub.Api.Repositories.Interfaces;
+using FinanceHub.Api.Domain.Exceptions;
+using FinanceHub.Api.Interfaces.Repositories;
+using FinanceHub.Api.Interfaces.Services;
 using FinanceHub.Api.Requests;
 using FinanceHub.Api.Responses;
-using FinanceHub.Api.Services.Interfaces;
 
 namespace FinanceHub.Api.Services
 {
@@ -18,6 +19,13 @@ namespace FinanceHub.Api.Services
         public async Task<CriarUsuarioResponse> CadastrarAsync(CriarUsuarioRequest request)
         {
             var usuario = new Usuario(request.Nome, request.Email, request.Senha);
+
+            var usuarioExistente = await _repository.BuscarPorEmailAsync(usuario.Email);
+
+            if (usuarioExistente != null)
+            {
+                throw new EmailJaCadastradoException(usuario.Email);
+            }
 
             await _repository.AdicionarAsync(usuario);
 

@@ -1,6 +1,6 @@
 ﻿using FinanceHub.Api.Domain.Entities;
+using FinanceHub.Api.Interfaces.Services;
 using FinanceHub.Api.Requests;
-using FinanceHub.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceHub.Api.Controllers
