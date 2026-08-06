@@ -7,5 +7,9 @@ namespace FinanceHub.Api.Interfaces.Repositories
         Task AdicionarAsync(Usuario usuario);
 
         Task<Usuario?> BuscarPorEmailAsync(string email);
+
+        Task<Usuario?> BuscarPorIdAsync(Guid id);
+
+        Task<IEnumerable<Usuario>> BuscarTodosAsync();
     }
 }

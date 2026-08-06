@@ -41,6 +41,20 @@ namespace FinanceHub.Api.Middlewares
                     return;
                 }
 
+                if (ex is UsuarioNaoEncontradoException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
+                    context.Response.ContentType = "application/json";
+
+                    await context.Response.WriteAsync(
+                        JsonSerializer.Serialize(new
+                        {
+                            message = ex.Message
+                        }));
+
+                    return;
+                }
+
                 if (ex is EmailJaCadastradoException)
                 {
                     context.Response.StatusCode = StatusCodes.Status409Conflict;
