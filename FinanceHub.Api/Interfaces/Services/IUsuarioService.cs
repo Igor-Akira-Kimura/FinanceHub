@@ -1,7 +1,7 @@
 ﻿using FinanceHub.Api.Requests;
 using FinanceHub.Api.Responses;
 
-namespace FinanceHub.Api.Services.Interfaces
+namespace FinanceHub.Api.Interfaces.Services
 {
     public interface IUsuarioService
     {

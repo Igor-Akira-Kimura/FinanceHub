@@ -1,9 +1,10 @@
 
-using FinanceHub.Api.Repositories;
-using FinanceHub.Api.Repositories.Interfaces;
-using FinanceHub.Api.Services;
-using FinanceHub.Api.Services.Interfaces;
 using FinanceHub.Api.Data;
+using FinanceHub.Api.Interfaces.Repositories;
+using FinanceHub.Api.Interfaces.Services;
+using FinanceHub.Api.Middlewares;
+using FinanceHub.Api.Repositories;
+using FinanceHub.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceHub.Api
@@ -34,6 +35,8 @@ namespace FinanceHub.Api
             });
 
             var app = builder.Build();
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
