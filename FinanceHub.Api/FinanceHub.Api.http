@@ -6,7 +6,7 @@ GET {{FinanceHub.Api_HostAddress}}/api/usuarios
 ###
 
 ### Buscar usuário por ID
-GET {{FinanceHub.Api_HostAddress}}/api/usuarios/11111111-1111-1111-1111-111111111111
+GET {{FinanceHub.Api_HostAddress}}/api/usuarios/01bba28f-ac4e-4a65-86e8-8c3c0ebc25f4
 
 ###
 
@@ -19,3 +19,17 @@ Content-Type: application/json
     "email": "igor@email.com",
     "senha": "123456"
 }
+
+###
+
+### Atualizar usuário
+
+PUT {{FinanceHub.Api_HostAddress}}/api/usuarios/01bba28f-ac4e-4a65-86e8-8c3c0ebc25f4
+Content-Type: application/json
+
+{
+    "nome": "",
+    "email": "igor@email.com"
+}
+
+###

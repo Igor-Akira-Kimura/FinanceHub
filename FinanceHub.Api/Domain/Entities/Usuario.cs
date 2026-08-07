@@ -18,21 +18,34 @@
 
         public Usuario(string nome, string email, string senhaHash)
         {
-            if (string.IsNullOrWhiteSpace(nome))
-                throw new ArgumentException("Nome é obrigatório.", nameof(nome));
-
-            if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("Email é obrigatório.", nameof(email));
+            DefinirDados(nome, email);
 
             if (string.IsNullOrWhiteSpace(senhaHash))
                 throw new ArgumentException("Senha é obrigatória.", nameof(senhaHash));
 
             Id = Guid.NewGuid();
-            Nome = nome;
-            Email = email;
             SenhaHash = senhaHash;
             Ativo = true;
             DataCriacao = DateTime.UtcNow;
+        }
+
+        public void Atualizar(string nome, string email)
+        {
+            DefinirDados(nome, email);
+
+            DataAtualizacao = DateTime.UtcNow;
+        }
+
+        private void DefinirDados(string nome, string email)
+        {
+            if (string.IsNullOrWhiteSpace(nome))
+                throw new ArgumentException("O nome é obrigatório.", nameof(nome));
+
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException("O e-mail é obrigatório.", nameof(email));
+
+            Nome = nome;
+            Email = email;
         }
     }
 }

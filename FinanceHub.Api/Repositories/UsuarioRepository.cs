@@ -35,5 +35,10 @@ namespace FinanceHub.Api.Repositories
         {
             return await _context.Usuarios.ToListAsync();
         }
+
+        public async Task SalvarAlteracoesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }
