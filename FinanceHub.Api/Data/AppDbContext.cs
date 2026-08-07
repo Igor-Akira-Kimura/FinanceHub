@@ -10,5 +10,17 @@ public class AppDbContext : DbContext
     {
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+        base.OnModelCreating(modelBuilder);
+    }
+
     public DbSet<Usuario> Usuarios { get; set; }
+
+    public DbSet<Bolsa> Bolsas { get; set; }
+
+    public DbSet<Ativo> Ativos { get; set; }
+
 }

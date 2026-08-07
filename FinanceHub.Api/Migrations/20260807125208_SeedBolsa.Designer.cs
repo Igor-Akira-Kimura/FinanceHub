@@ -4,6 +4,7 @@ using FinanceHub.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinanceHub.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260807125208_SeedBolsa")]
+    partial class SeedBolsa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,24 +34,16 @@ namespace FinanceHub.Api.Migrations
                     b.Property<Guid>("BolsaId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("DataAtualizacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("EstaAtivo")
                         .HasColumnType("bit");
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Ticker")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Tipo")
                         .HasColumnType("int");
@@ -57,10 +52,7 @@ namespace FinanceHub.Api.Migrations
 
                     b.HasIndex("BolsaId");
 
-                    b.HasIndex("Ticker")
-                        .IsUnique();
-
-                    b.ToTable("Ativos");
+                    b.ToTable("Ativo");
                 });
 
             modelBuilder.Entity("FinanceHub.Api.Domain.Entities.Bolsa", b =>
@@ -164,7 +156,7 @@ namespace FinanceHub.Api.Migrations
                     b.HasOne("FinanceHub.Api.Domain.Entities.Bolsa", "Bolsa")
                         .WithMany("Ativos")
                         .HasForeignKey("BolsaId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Bolsa");

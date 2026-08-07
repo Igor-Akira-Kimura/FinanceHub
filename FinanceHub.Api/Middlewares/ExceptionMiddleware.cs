@@ -85,6 +85,51 @@ namespace FinanceHub.Api.Middlewares
                     return;
                 }
 
+                if (ex is TickerJaCadastradoException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status409Conflict;
+                    context.Response.ContentType = "application/json";
+
+                    await context.Response.WriteAsync(
+                        JsonSerializer.Serialize(
+                            new
+                            {
+                                message = ex.Message
+                            }
+                        )
+                    );
+
+                    return;
+                }
+
+                if (ex is BolsaNaoEncontradaException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
+                    context.Response.ContentType = "application/json";
+
+                    await context.Response.WriteAsync(
+                        JsonSerializer.Serialize(new
+                        {
+                            message = ex.Message
+                        }));
+
+                    return;
+                }
+
+                if (ex is AtivoNaoEncontradoException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
+                    context.Response.ContentType = "application/json";
+
+                    await context.Response.WriteAsync(
+                        JsonSerializer.Serialize(new
+                        {
+                            message = ex.Message
+                        }));
+
+                    return;
+                }
+
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = "application/json";
 
