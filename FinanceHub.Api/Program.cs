@@ -25,9 +25,13 @@ namespace FinanceHub.Api
 
             // DI Services
             builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+            builder.Services.AddScoped<IAtivoService, AtivoService>();
+            builder.Services.AddScoped<IBolsaService, BolsaService>();
 
             // DI Repositories
             builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+            builder.Services.AddScoped<IAtivoRepository, AtivoRepository>();
+            builder.Services.AddScoped<IBolsaRepository, BolsaRepository>();
 
             // DI DbContext
             builder.Services.AddDbContext<AppDbContext>(options =>

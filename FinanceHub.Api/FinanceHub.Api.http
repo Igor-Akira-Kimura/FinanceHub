@@ -38,3 +38,56 @@ Content-Type: application/json
 DELETE {{FinanceHub.Api_HostAddress}}/api/usuarios/11111111-1111-1111-1111-111111111111
 
 ###
+
+
+
+### Buscar todas as bolsas
+
+GET {{FinanceHub.Api_HostAddress}}/api/bolsas
+
+
+
+### Criar Ativo
+
+POST {{FinanceHub.Api_HostAddress}}/api/ativos
+Content-Type: application/json
+
+{
+    "nome": "Itaú Unibanco",
+    "ticker": "BBAS3",
+    "tipo": 0,
+    "bolsaId": "41111111-1111-1111-1111-111111111111"
+}
+
+###
+
+### Buscar todos os ativos
+
+GET {{FinanceHub.Api_HostAddress}}/api/ativos
+
+###
+
+### Buscar por Id
+
+GET {{FinanceHub.Api_HostAddress}}/api/ativos/CE6C5F54-D039-4A73-8C75-08DEF4C7E5F5
+
+###
+
+### Atualizar
+
+PUT {{FinanceHub.Api_HostAddress}}/api/ativos/CE6C5F54-D039-4A73-8C75-08DEF4C7E5F5
+Content-Type: application/json
+
+{
+    "nome": "Itaú Unibanco Holding",
+    "ticker": "ITUB4",
+    "tipo": 0
+}
+
+###
+
+### Desativar
+
+DELETE {{FinanceHub.Api_HostAddress}}/api/ativos/CE6C5F54-D039-4A73-8C75-08DEF4C7E5F5
+
+###
