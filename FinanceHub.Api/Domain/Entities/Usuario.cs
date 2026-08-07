@@ -1,4 +1,6 @@
-﻿namespace FinanceHub.Api.Domain.Entities
+﻿using FinanceHub.Api.Domain.Exceptions;
+
+namespace FinanceHub.Api.Domain.Entities
 {
     public class Usuario
     {
@@ -46,6 +48,17 @@
 
             Nome = nome;
             Email = email;
+        }
+
+        public void Desativar()
+        {
+            if (!Ativo)
+            {
+                throw new UsuarioJaDesativadoException(Id);
+            }
+
+            Ativo = false;
+            DataAtualizacao = DateTime.UtcNow;
         }
     }
 }

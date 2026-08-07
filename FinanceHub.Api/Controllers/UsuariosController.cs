@@ -48,5 +48,12 @@ namespace FinanceHub.Api.Controllers
 
             return NoContent();
         }
+        
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Desativar(Guid id)
+        {
+            await _usuarioService.DesativarAsync(id);
+            return NoContent();
+        }
     }
 }

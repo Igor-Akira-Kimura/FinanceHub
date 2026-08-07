@@ -12,5 +12,7 @@ namespace FinanceHub.Api.Interfaces.Services
         Task<IEnumerable<UsuarioResponse>> BuscarTodosAsync();
 
         Task AtualizarAsync(Guid id, AtualizarUsuarioRequest request);
+
+        Task DesativarAsync(Guid id);
     }
 }
