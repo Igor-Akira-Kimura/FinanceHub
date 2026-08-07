@@ -72,6 +72,19 @@ namespace FinanceHub.Api.Middlewares
                     return;
                 }
 
+                if (ex is UsuarioJaDesativadoException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status409Conflict;
+                    context.Response.ContentType = "application/json";
+
+                    await context.Response.WriteAsJsonAsync(new
+                    {
+                        message = ex.Message
+                    });
+
+                    return;
+                }
+
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = "application/json";
 

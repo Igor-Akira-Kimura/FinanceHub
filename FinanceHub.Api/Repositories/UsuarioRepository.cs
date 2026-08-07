@@ -23,17 +23,17 @@ namespace FinanceHub.Api.Repositories
 
         public async Task<Usuario?> BuscarPorEmailAsync(string email)
         {
-            return await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+            return await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email && u.Ativo);
         }
 
         public async Task<Usuario?> BuscarPorIdAsync(Guid id)
         {
-            return await _context.Usuarios.FindAsync(id);
+            return await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id && u.Ativo);
         }
 
         public async Task<IEnumerable<Usuario>> BuscarTodosAsync()
         {
-            return await _context.Usuarios.ToListAsync();
+            return await _context.Usuarios.Where(u => u.Ativo).ToListAsync();
         }
 
         public async Task SalvarAlteracoesAsync()

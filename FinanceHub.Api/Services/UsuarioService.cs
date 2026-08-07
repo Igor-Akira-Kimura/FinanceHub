@@ -99,5 +99,19 @@ namespace FinanceHub.Api.Services
 
             await _repository.SalvarAlteracoesAsync();
         }
+
+        public async Task DesativarAsync(Guid id)
+        {
+            var usuario = await _repository.BuscarPorIdAsync(id);
+
+            if (usuario is null)
+            {
+                throw new UsuarioNaoEncontradoException(id);
+            }
+
+            usuario.Desativar();
+
+            await _repository.SalvarAlteracoesAsync();
+        }
     }
 }
