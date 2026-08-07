@@ -1,4 +1,5 @@
-﻿using FinanceHub.Api.Domain.Entities;
+﻿using Azure.Core;
+using FinanceHub.Api.Domain.Entities;
 using FinanceHub.Api.Domain.Exceptions;
 using FinanceHub.Api.Interfaces.Repositories;
 using FinanceHub.Api.Interfaces.Services;
@@ -12,13 +13,16 @@ namespace FinanceHub.Api.Services
     {
         private readonly IUsuarioRepository _repository;
         private readonly IValidator<CriarUsuarioRequest> _validator;
+        private readonly IValidator<AtualizarUsuarioRequest> _atualizarValidator;
 
         public UsuarioService(
             IUsuarioRepository repository,
-            IValidator<CriarUsuarioRequest> validator)  
+            IValidator<CriarUsuarioRequest> validator,
+            IValidator<AtualizarUsuarioRequest> atualizarValidator)  
         {
             _repository = repository;
             _validator = validator;
+            _atualizarValidator = atualizarValidator;
         }
 
         public async Task<CriarUsuarioResponse> CadastrarAsync(CriarUsuarioRequest request)
@@ -71,6 +75,29 @@ namespace FinanceHub.Api.Services
                 Nome = usuario.Nome,
                 Email = usuario.Email
             });
+        }
+
+        public async Task AtualizarAsync(Guid id, AtualizarUsuarioRequest request)
+        {
+            await _atualizarValidator.ValidateAndThrowAsync(request);
+
+            var usuario = await _repository.BuscarPorIdAsync(id);
+
+            if (usuario is null)
+            {
+                throw new UsuarioNaoEncontradoException(id);
+            }
+
+            var usuarioComMesmoEmail = await _repository.BuscarPorEmailAsync(request.Email);
+
+            if (usuarioComMesmoEmail is not null && usuarioComMesmoEmail.Id != usuario.Id)
+            {
+                throw new EmailJaCadastradoException(request.Email);
+            }
+
+            usuario.Atualizar(request.Nome, request.Email);
+
+            await _repository.SalvarAlteracoesAsync();
         }
     }
 }

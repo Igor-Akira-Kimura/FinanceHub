@@ -40,5 +40,13 @@ namespace FinanceHub.Api.Controllers
 
             return Ok(response);
         }
+
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Atualizar(Guid id, AtualizarUsuarioRequest request)
+        {
+            await _usuarioService.AtualizarAsync(id, request);
+
+            return NoContent();
+        }
     }
 }

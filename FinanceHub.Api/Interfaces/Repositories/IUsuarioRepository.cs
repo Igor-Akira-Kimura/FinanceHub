@@ -11,5 +11,7 @@ namespace FinanceHub.Api.Interfaces.Repositories
         Task<Usuario?> BuscarPorIdAsync(Guid id);
 
         Task<IEnumerable<Usuario>> BuscarTodosAsync();
+
+        Task SalvarAlteracoesAsync();
     }
 }
