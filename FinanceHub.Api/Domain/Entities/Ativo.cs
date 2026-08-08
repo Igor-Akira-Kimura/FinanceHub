@@ -23,6 +23,8 @@ namespace FinanceHub.Api.Domain.Entities
 
         public DateTime? DataAtualizacao { get; private set; }
 
+        public ICollection<Posicao> Posicoes { get; private set; } = [];
+
         private Ativo()
         {
         }
