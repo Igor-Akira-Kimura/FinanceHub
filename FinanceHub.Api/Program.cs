@@ -1,4 +1,5 @@
 
+using FinanceHub.Api.Application.Requests.Carteiras;
 using FinanceHub.Api.Data;
 using FinanceHub.Api.Interfaces.Repositories;
 using FinanceHub.Api.Interfaces.Services;
@@ -8,6 +9,7 @@ using FinanceHub.Api.Services;
 using FinanceHub.Api.Validators;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation.AspNetCore;
 
 namespace FinanceHub.Api
 {
@@ -27,11 +29,16 @@ namespace FinanceHub.Api
             builder.Services.AddScoped<IUsuarioService, UsuarioService>();
             builder.Services.AddScoped<IAtivoService, AtivoService>();
             builder.Services.AddScoped<IBolsaService, BolsaService>();
+            builder.Services.AddScoped<ICarteiraService, CarteiraService>();
+            builder.Services.AddScoped<IPosicaoService, PosicaoService>();
 
             // DI Repositories
             builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
             builder.Services.AddScoped<IAtivoRepository, AtivoRepository>();
             builder.Services.AddScoped<IBolsaRepository, BolsaRepository>();
+            builder.Services.AddScoped<ICarteiraRepository, CarteiraRepository>();
+            builder.Services.AddScoped<IPosicaoRepository, PosicaoRepository>();
+            builder.Services.AddScoped<IMovimentacaoRepository, MovimentacaoRepository>();
 
             // DI DbContext
             builder.Services.AddDbContext<AppDbContext>(options =>

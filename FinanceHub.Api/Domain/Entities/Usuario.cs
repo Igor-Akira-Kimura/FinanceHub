@@ -18,6 +18,8 @@ namespace FinanceHub.Api.Domain.Entities
 
         public DateTime? DataAtualizacao { get; private set; }
 
+        public ICollection<Carteira> Carteiras { get; private set; } = [];
+
         public Usuario(string nome, string email, string senhaHash)
         {
             DefinirDados(nome, email);

@@ -130,6 +130,65 @@ namespace FinanceHub.Api.Middlewares
                     return;
                 }
 
+                if (ex is QuantidadeInsuficienteException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    context.Response.ContentType = "application/json";
+
+                    await context.Response.WriteAsync(
+                        JsonSerializer.Serialize(new
+                        {
+                            message = ex.Message
+                        }));
+
+                    return;
+                }
+
+                if (ex is CarteiraNaoEncontradaException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
+                    context.Response.ContentType = "application/json";
+
+                    await context.Response.WriteAsync(
+                        JsonSerializer.Serialize(new
+                        {
+                            message = ex.Message
+                        }));
+
+                    return;
+                }
+                
+                if (ex is PosicaoNaoEncontradaException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
+                    context.Response.ContentType = "application/json";
+
+                    await context.Response.WriteAsync(
+                        JsonSerializer.Serialize(new
+                        {
+                            message = ex.Message
+                        }));
+
+                    return;
+                }
+
+                if (ex is CarteiraJaCadastradaException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status409Conflict;
+                    context.Response.ContentType = "application/json";
+
+                    await context.Response.WriteAsync(
+                        JsonSerializer.Serialize(
+                            new
+                            {
+                                message = ex.Message
+                            }
+                        )
+                    );
+
+                    return;
+                }
+
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = "application/json";
 

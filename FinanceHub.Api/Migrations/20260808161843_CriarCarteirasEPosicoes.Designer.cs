@@ -4,6 +4,7 @@ using FinanceHub.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinanceHub.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260808161843_CriarCarteirasEPosicoes")]
+    partial class CriarCarteirasEPosicoes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,36 +161,6 @@ namespace FinanceHub.Api.Migrations
                     b.ToTable("Carteiras", (string)null);
                 });
 
-            modelBuilder.Entity("FinanceHub.Api.Domain.Entities.Movimentacao", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("DataMovimentacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("PosicaoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Preco")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<decimal>("Quantidade")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<int>("Tipo")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PosicaoId");
-
-                    b.ToTable("Movimentacoes", (string)null);
-                });
-
             modelBuilder.Entity("FinanceHub.Api.Domain.Entities.Posicao", b =>
                 {
                     b.Property<Guid>("Id")
@@ -278,17 +251,6 @@ namespace FinanceHub.Api.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("FinanceHub.Api.Domain.Entities.Movimentacao", b =>
-                {
-                    b.HasOne("FinanceHub.Api.Domain.Entities.Posicao", "Posicao")
-                        .WithMany("Movimentacoes")
-                        .HasForeignKey("PosicaoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Posicao");
-                });
-
             modelBuilder.Entity("FinanceHub.Api.Domain.Entities.Posicao", b =>
                 {
                     b.HasOne("FinanceHub.Api.Domain.Entities.Ativo", "Ativo")
@@ -321,11 +283,6 @@ namespace FinanceHub.Api.Migrations
             modelBuilder.Entity("FinanceHub.Api.Domain.Entities.Carteira", b =>
                 {
                     b.Navigation("Posicoes");
-                });
-
-            modelBuilder.Entity("FinanceHub.Api.Domain.Entities.Posicao", b =>
-                {
-                    b.Navigation("Movimentacoes");
                 });
 
             modelBuilder.Entity("FinanceHub.Api.Domain.Entities.Usuario", b =>
