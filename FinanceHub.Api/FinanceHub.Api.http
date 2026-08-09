@@ -91,3 +91,43 @@ Content-Type: application/json
 DELETE {{FinanceHub.Api_HostAddress}}/api/ativos/CE6C5F54-D039-4A73-8C75-08DEF4C7E5F5
 
 ###
+
+### Criar uma Carteira
+
+POST {{FinanceHub.Api_HostAddress}}/api/carteiras
+Content-Type: application/json
+
+{
+  "usuarioId": "D8478176-56DC-43F1-AE30-BF76369250F6",
+  "nome": "Carteira Principal"
+}
+
+###
+
+### Criar uma compra de um ativo
+
+POST {{FinanceHub.Api_HostAddress}}/api/carteiras/comprar
+Content-Type: application/json
+
+{
+    "carteiraId":"11111111-1111-1111-1111-111111111111",
+    "ativoId":"CE6C5F54-D039-4A73-8C75-08DEF4C7E5F5",
+    "quantidade":50,
+    "preco":20
+}
+
+###
+
+### Criar uma venda de um ativo
+
+POST {{FinanceHub.Api_HostAddress}}/api/carteiras/vender
+Content-Type: application/json
+
+{
+    "carteiraId":"542B2700-26EA-4778-B0D2-6C7A9E5671A6",
+    "ativoId":"11111111-1111-1111-1111-111111111111",
+    "quantidade":1,
+    "preco":10
+}
+
+###

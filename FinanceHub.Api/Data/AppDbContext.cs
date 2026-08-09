@@ -23,4 +23,9 @@ public class AppDbContext : DbContext
 
     public DbSet<Ativo> Ativos { get; set; }
 
+    public DbSet<Carteira> Carteiras { get; set; }
+
+    public DbSet<Posicao> Posicoes { get; set; }
+
+    public DbSet<Movimentacao> Movimentacoes { get; set; }
 }

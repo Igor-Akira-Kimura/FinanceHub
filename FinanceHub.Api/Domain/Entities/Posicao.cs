@@ -22,11 +22,13 @@ namespace FinanceHub.Api.Domain.Entities
 
         public Ativo Ativo { get; private set; } = null!;
 
-        public Posicao(
-            Guid carteiraId,
-            Guid ativoId,
-            decimal quantidade,
-            decimal precoMedio)
+        public ICollection<Movimentacao> Movimentacoes { get; private set; } = [];
+
+        private Posicao()
+        {
+        }
+
+        public Posicao(Guid carteiraId, Guid ativoId, decimal quantidade, decimal precoMedio)
         {
             DefinirDados(quantidade, precoMedio);
 
@@ -63,9 +65,20 @@ namespace FinanceHub.Api.Domain.Entities
             PrecoMedio = precoMedio;
         }
 
-        public void Comprar(decimal quantidade, decimal preco)
+        public Movimentacao Comprar(decimal quantidade, decimal preco)
         {
             ValidarDados(quantidade, preco);
+
+            if (Quantidade == 0)
+            {
+                DefinirDados(quantidade, preco);
+                DataAtualizacao = DateTime.UtcNow;
+
+                return Movimentacao.CriarCompra(
+                    Id,
+                    quantidade,
+                    preco);
+            }
 
             var novaQuantidade = Quantidade + quantidade;
 
@@ -77,19 +90,27 @@ namespace FinanceHub.Api.Domain.Entities
 
             Quantidade = novaQuantidade;
             DataAtualizacao = DateTime.UtcNow;
+
+            return Movimentacao.CriarCompra(
+                Id,
+                quantidade,
+                preco);
         }
 
-        public void Vender(decimal quantidade)
+        public Movimentacao Vender(decimal quantidade, decimal preco)
         {
             ValidarQuantidade(quantidade);
 
             if (quantidade > Quantidade)
-            {
                 throw new QuantidadeInsuficienteException(Id, Quantidade, quantidade);
-            }
 
             Quantidade -= quantidade;
             DataAtualizacao = DateTime.UtcNow;
+
+            return Movimentacao.CriarVenda(
+                Id,
+                quantidade,
+                preco);
         }
     }
 }
