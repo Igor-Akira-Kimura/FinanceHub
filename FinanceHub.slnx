@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="FinanceHub.Api/FinanceHub.Api.csproj" />
+  <Project Path="FinanceHub.Tests/FinanceHub.Tests.csproj" />
 </Solution>
