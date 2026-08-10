@@ -10,6 +10,8 @@ namespace FinanceHub.Api.Interfaces.Services
 
         Task<IEnumerable<CarteiraResponse>> BuscarTodasAsync(Guid usuarioId);
 
+        Task<IEnumerable<CarteiraResponse>> BuscarMinhasAsync();
+
         Task<CarteiraResponse> BuscarPorIdAsync(Guid id);
 
         Task ComprarAtivoAsync(ComprarAtivoRequest request);

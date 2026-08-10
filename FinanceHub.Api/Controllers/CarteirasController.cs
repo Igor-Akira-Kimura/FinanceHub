@@ -1,12 +1,14 @@
 ﻿using FinanceHub.Api.Application.Requests.Carteiras;
 using FinanceHub.Api.Interfaces.Services;
 using FinanceHub.Api.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceHub.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CarteirasController : ControllerBase
     {
         private readonly ICarteiraService _service;
@@ -39,6 +41,14 @@ namespace FinanceHub.Api.Controllers
                 await _service.BuscarTodasAsync(usuarioId);
 
             return Ok(carteiras);
+        }
+
+        [HttpGet("minhas")]
+        public async Task<IActionResult> BuscarMinhas()
+        {
+            var response = await _service.BuscarMinhasAsync();
+
+            return Ok(response);
         }
 
         [HttpPost("comprar")]

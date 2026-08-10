@@ -1,4 +1,5 @@
-﻿using FinanceHub.Api.Application.Requests.Carteiras;
+﻿using FinanceHub.Api.Application.Common;
+using FinanceHub.Api.Application.Requests.Carteiras;
 using FinanceHub.Api.Domain.Entities;
 using FinanceHub.Api.Domain.Exceptions;
 using FinanceHub.Api.Interfaces.Repositories;
@@ -19,8 +20,9 @@ namespace FinanceHub.Api.Services
 
         private readonly IValidator<ComprarAtivoRequest> _comprarValidator;
         private readonly IValidator<VenderAtivoRequest> _venderValidator;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CarteiraService(ICarteiraRepository carteiraRepository, IUsuarioRepository usuarioRepository, IAtivoRepository ativoRepository, IPosicaoRepository posicaoRepository, IMovimentacaoRepository movimentacaoRepository, IValidator<ComprarAtivoRequest> comprarAtivoRequestValidator, IValidator<VenderAtivoRequest> venderAtivoRequestValidator)
+        public CarteiraService(ICarteiraRepository carteiraRepository, IUsuarioRepository usuarioRepository, IAtivoRepository ativoRepository, IPosicaoRepository posicaoRepository, IMovimentacaoRepository movimentacaoRepository, IValidator<ComprarAtivoRequest> comprarAtivoRequestValidator, IValidator<VenderAtivoRequest> venderAtivoRequestValidator, ICurrentUserService currentUserService)
         {
             _carteiraRepository = carteiraRepository;
             _usuarioRepository = usuarioRepository;
@@ -29,22 +31,23 @@ namespace FinanceHub.Api.Services
             _movimentacaoRepository = movimentacaoRepository;
             _comprarValidator = comprarAtivoRequestValidator;
             _venderValidator = venderAtivoRequestValidator;
+            _currentUserService = currentUserService;
         }
 
         public async Task<Guid> CriarAsync(CriarCarteiraRequest request)
         {
-            var usuario = await _usuarioRepository.BuscarPorIdAsync(request.UsuarioId);
+            var usuario = await _usuarioRepository.BuscarPorIdAsync(_currentUserService.Usuario.Id);
             if (usuario is null)
-                throw new UsuarioNaoEncontradoException(request.UsuarioId);
+                throw new UsuarioNaoEncontradoException(_currentUserService.Usuario.Id);
 
             if (!usuario.Ativo)
-                throw new UsuarioInativoException(request.UsuarioId);
+                throw new UsuarioInativoException(_currentUserService.Usuario.Id);
 
-            var carteiraExistente = await _carteiraRepository.BuscarPorNomeAsync(request.UsuarioId, request.Nome);
+            var carteiraExistente = await _carteiraRepository.BuscarPorNomeAsync(_currentUserService.Usuario.Id, request.Nome);
             if (carteiraExistente != null)
                 throw new CarteiraJaCadastradaException(request.Nome);
 
-            var novaCarteira = new Carteira(request.Nome, request.UsuarioId);
+            var novaCarteira = new Carteira(request.Nome, _currentUserService.Usuario.Id);
 
             await _carteiraRepository.CriarAsync(novaCarteira);
 
@@ -70,6 +73,11 @@ namespace FinanceHub.Api.Services
                 Id = c.Id,
                 Nome = c.Nome
             });
+        }
+
+        public async Task<IEnumerable<CarteiraResponse>> BuscarMinhasAsync()
+        {
+            return await BuscarTodasAsync(_currentUserService.Usuario.Id);
         }
 
         public async Task<CarteiraResponse> BuscarPorIdAsync(Guid id)
