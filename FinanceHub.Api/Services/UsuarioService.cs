@@ -14,22 +14,27 @@ namespace FinanceHub.Api.Services
         private readonly IUsuarioRepository _repository;
         private readonly IValidator<CriarUsuarioRequest> _validator;
         private readonly IValidator<AtualizarUsuarioRequest> _atualizarValidator;
+        private readonly IPasswordService _passwordHasher;
 
         public UsuarioService(
             IUsuarioRepository repository,
             IValidator<CriarUsuarioRequest> validator,
-            IValidator<AtualizarUsuarioRequest> atualizarValidator)  
+            IValidator<AtualizarUsuarioRequest> atualizarValidator,
+            IPasswordService passwordHasher)  
         {
             _repository = repository;
             _validator = validator;
             _atualizarValidator = atualizarValidator;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<CriarUsuarioResponse> CadastrarAsync(CriarUsuarioRequest request)
         {
             await _validator.ValidateAndThrowAsync(request);
 
-            var usuario = new Usuario(request.Nome, request.Email, request.Senha);
+            var senhaHash = _passwordHasher.Hash(request.Senha);
+
+            var usuario = new Usuario(request.Nome, request.Email, senhaHash);
 
             var usuarioExistente = await _repository.BuscarPorEmailAsync(usuario.Email);
 

@@ -1,4 +1,5 @@
 ﻿using FinanceHub.Api.Domain.Exceptions;
+using FinanceHub.Api.Exceptions;
 using FluentValidation;
 using System.Text.Json;
 
@@ -175,6 +176,23 @@ namespace FinanceHub.Api.Middlewares
                 if (ex is CarteiraJaCadastradaException)
                 {
                     context.Response.StatusCode = StatusCodes.Status409Conflict;
+                    context.Response.ContentType = "application/json";
+
+                    await context.Response.WriteAsync(
+                        JsonSerializer.Serialize(
+                            new
+                            {
+                                message = ex.Message
+                            }
+                        )
+                    );
+
+                    return;
+                }
+
+                if (ex is CredenciaisInvalidasException)
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     context.Response.ContentType = "application/json";
 
                     await context.Response.WriteAsync(

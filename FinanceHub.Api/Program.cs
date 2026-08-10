@@ -10,6 +10,11 @@ using FinanceHub.Api.Validators;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation.AspNetCore;
+using FinanceHub.Api.Configurations;
+using System.Text;
+using FinanceHub.Api.Configurations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FinanceHub.Api
 {
@@ -25,12 +30,18 @@ namespace FinanceHub.Api
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
+            builder.Services.AddHttpContextAccessor();
+
             // DI Services
             builder.Services.AddScoped<IUsuarioService, UsuarioService>();
             builder.Services.AddScoped<IAtivoService, AtivoService>();
             builder.Services.AddScoped<IBolsaService, BolsaService>();
             builder.Services.AddScoped<ICarteiraService, CarteiraService>();
             builder.Services.AddScoped<IPosicaoService, PosicaoService>();
+            builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IPasswordService, PasswordService>();
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             // DI Repositories
             builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
@@ -47,6 +58,33 @@ namespace FinanceHub.Api
                     builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            // DI JwtSettings
+            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+
+            var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()!;
+
+            builder.Services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = jwtSettings.Issuer,
+
+                        ValidateAudience = true,
+                        ValidAudience = jwtSettings.Audience,
+
+                        ValidateLifetime = true,
+
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(jwtSettings.Key)),
+
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+
             var app = builder.Build();
 
             app.UseMiddleware<ExceptionMiddleware>();
@@ -59,6 +97,7 @@ namespace FinanceHub.Api
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

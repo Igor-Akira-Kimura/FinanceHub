@@ -11,9 +11,6 @@ namespace FinanceHub.Api.Validators
             RuleFor(x => x.Nome)
                 .NotEmpty()
                 .MaximumLength(100);
-
-            RuleFor(x => x.UsuarioId)
-                .NotEmpty();
         }
     }
 }
