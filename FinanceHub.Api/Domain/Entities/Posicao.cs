@@ -69,17 +69,6 @@ namespace FinanceHub.Api.Domain.Entities
         {
             ValidarDados(quantidade, preco);
 
-            if (Quantidade == 0)
-            {
-                DefinirDados(quantidade, preco);
-                DataAtualizacao = DateTime.UtcNow;
-
-                return Movimentacao.CriarCompra(
-                    Id,
-                    quantidade,
-                    preco);
-            }
-
             var novaQuantidade = Quantidade + quantidade;
 
             var valorAtual = Quantidade * PrecoMedio;
