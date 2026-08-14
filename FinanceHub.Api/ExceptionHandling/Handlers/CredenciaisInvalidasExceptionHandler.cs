@@ -1,6 +1,5 @@
-﻿using FinanceHub.Api.Domain.Exceptions;
+﻿using FinanceHub.Domain.Exceptions;
 using FinanceHub.Api.ExceptionHandling.Responses;
-using FinanceHub.Api.Exceptions;
 
 namespace FinanceHub.Api.ExceptionHandling.Handlers;
 

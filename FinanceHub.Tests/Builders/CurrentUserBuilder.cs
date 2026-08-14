@@ -1,4 +1,4 @@
-﻿using FinanceHub.Api.Application.Common;
+﻿using FinanceHub.Application.Common;
 
 namespace FinanceHub.Tests.Builders;
 

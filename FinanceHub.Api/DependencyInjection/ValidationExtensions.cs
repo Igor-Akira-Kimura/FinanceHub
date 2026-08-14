@@ -1,4 +1,4 @@
-﻿using FinanceHub.Api.Validators;
+﻿using FinanceHub.Application.Validators;
 using FluentValidation;
 
 namespace FinanceHub.Api.DependencyInjection;

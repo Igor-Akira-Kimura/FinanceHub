@@ -1,7 +1,7 @@
-﻿using FinanceHub.Api.Application.Requests.Carteiras;
-using FinanceHub.Api.Domain.Entities;
-using FinanceHub.Api.Domain.Exceptions;
-using FinanceHub.Api.Requests;
+﻿using FinanceHub.Application.Requests.Carteiras;
+using FinanceHub.Domain.Entities;
+using FinanceHub.Domain.Exceptions;
+using FinanceHub.Application.Requests;
 using FinanceHub.Tests.Builders;
 using FinanceHub.Tests.Fixtures;
 using FluentAssertions;

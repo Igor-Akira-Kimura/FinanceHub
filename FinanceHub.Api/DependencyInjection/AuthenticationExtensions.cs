@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using FinanceHub.Api.Configurations;
+using FinanceHub.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 

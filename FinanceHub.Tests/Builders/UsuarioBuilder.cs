@@ -1,4 +1,4 @@
-﻿using FinanceHub.Api.Domain.Entities;
+﻿using FinanceHub.Domain.Entities;
 
 namespace FinanceHub.Tests.Builders;
 

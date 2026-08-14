@@ -1,4 +1,4 @@
-﻿using FinanceHub.Api.Data;
+﻿using FinanceHub.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceHub.Api.DependencyInjection;
