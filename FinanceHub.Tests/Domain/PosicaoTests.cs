@@ -1,6 +1,6 @@
-﻿using FinanceHub.Api.Domain.Entities;
-using FinanceHub.Api.Domain.Enums;
-using FinanceHub.Api.Domain.Exceptions;
+﻿using FinanceHub.Domain.Entities;
+using FinanceHub.Domain.Enums;
+using FinanceHub.Domain.Exceptions;
 using FluentAssertions;
 
 namespace FinanceHub.Tests.Domain;

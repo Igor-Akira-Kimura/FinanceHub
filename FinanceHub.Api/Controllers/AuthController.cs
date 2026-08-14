@@ -1,5 +1,5 @@
-﻿using FinanceHub.Api.Application.Requests.Auth;
-using FinanceHub.Api.Interfaces.Services;
+﻿using FinanceHub.Application.Requests.Auth;
+using FinanceHub.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceHub.Api.Controllers;

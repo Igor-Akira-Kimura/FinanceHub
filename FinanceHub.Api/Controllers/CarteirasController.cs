@@ -1,6 +1,6 @@
-﻿using FinanceHub.Api.Application.Requests.Carteiras;
-using FinanceHub.Api.Interfaces.Services;
-using FinanceHub.Api.Requests;
+﻿using FinanceHub.Application.Requests.Carteiras;
+using FinanceHub.Application.Interfaces.Services;
+using FinanceHub.Application.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

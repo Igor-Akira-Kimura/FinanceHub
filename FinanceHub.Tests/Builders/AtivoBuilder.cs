@@ -1,5 +1,5 @@
-﻿using FinanceHub.Api.Domain.Entities;
-using FinanceHub.Api.Domain.Enums;
+﻿using FinanceHub.Domain.Entities;
+using FinanceHub.Domain.Enums;
 
 namespace FinanceHub.Tests.Builders;
 

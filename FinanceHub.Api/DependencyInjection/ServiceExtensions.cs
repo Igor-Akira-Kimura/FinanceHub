@@ -1,5 +1,8 @@
-﻿using FinanceHub.Api.Interfaces.Services;
-using FinanceHub.Api.Services;
+﻿using FinanceHub.Api.Authentication;
+using FinanceHub.Application.Interfaces.Services;
+using FinanceHub.Application.Services;
+using FinanceHub.Infrastructure.Authentication;
+using FinanceHub.Infrastructure.Security;
 
 namespace FinanceHub.Api.DependencyInjection;
 

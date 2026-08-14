@@ -1,4 +1,7 @@
 <Solution>
   <Project Path="FinanceHub.Api/FinanceHub.Api.csproj" />
+  <Project Path="FinanceHub.Application/FinanceHub.Application.csproj" Id="baaa25d5-45c7-47a6-9b04-8a7c263379f3" />
+  <Project Path="FinanceHub.Domain/FinanceHub.Domain.csproj" Id="b9b067b3-fd7e-402b-92a1-1f8d6d10508d" />
+  <Project Path="FinanceHub.Infrastructure/FinanceHub.Infrastructure.csproj" Id="aa11c7ae-6772-44d0-a990-95063bcdb7f8" />
   <Project Path="FinanceHub.Tests/FinanceHub.Tests.csproj" />
 </Solution>

@@ -1,5 +1,5 @@
-﻿using FinanceHub.Api.Interfaces.Repositories;
-using FinanceHub.Api.Repositories;
+﻿using FinanceHub.Application.Interfaces.Repositories;
+using FinanceHub.Infrastructure.Repositories;
 
 namespace FinanceHub.Api.DependencyInjection;
 

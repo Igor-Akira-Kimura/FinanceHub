@@ -1,10 +1,10 @@
-﻿using FinanceHub.Api.Application.Common;
-using FinanceHub.Api.Application.Requests.Carteiras;
-using FinanceHub.Api.Domain.Entities;
-using FinanceHub.Api.Interfaces.Repositories;
-using FinanceHub.Api.Interfaces.Services;
-using FinanceHub.Api.Requests;
-using FinanceHub.Api.Services;
+﻿using FinanceHub.Application.Common;
+using FinanceHub.Application.Requests.Carteiras;
+using FinanceHub.Domain.Entities;
+using FinanceHub.Application.Interfaces.Repositories;
+using FinanceHub.Application.Interfaces.Services;
+using FinanceHub.Application.Requests;
+using FinanceHub.Application.Services;
 using FinanceHub.Tests.Builders;
 using FluentValidation;
 using FluentValidation.Results;
