@@ -10,5 +10,9 @@ namespace FinanceHub.Application.Interfaces.Repositories
     public interface IOutboxRepository
     {
         Task CriarAsync(OutboxMessage message);
+
+        Task<IEnumerable<OutboxMessage>> BuscarPendentesAsync();
+
+        Task MarcarComoProcessadoAsync(Guid id, DateTime processedAt);
     }
 }
