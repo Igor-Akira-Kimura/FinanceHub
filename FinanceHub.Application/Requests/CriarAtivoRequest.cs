@@ -11,5 +11,7 @@ namespace FinanceHub.Application.Requests
         public TipoAtivo Tipo { get; set; }
 
         public Guid BolsaId { get; set; }
+
+        public decimal Preco { get; set; }
     }
 }

@@ -33,7 +33,8 @@ namespace FinanceHub.Application.Services
                 request.Nome,
                 request.Ticker,
                 request.Tipo,
-                request.BolsaId);
+                request.BolsaId,
+                request.Preco);
 
             await _ativoRepository.CriarAsync(ativo);
 

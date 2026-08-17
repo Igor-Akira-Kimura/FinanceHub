@@ -21,6 +21,10 @@ public class AtivoConfiguration : IEntityTypeConfiguration<Ativo>
         builder.Property(x => x.Tipo)
             .IsRequired();
 
+        builder.Property(x => x.Preco)
+            .IsRequired()
+            .HasPrecision(18, 4);
+
         builder.HasOne(x => x.Bolsa)
             .WithMany(x => x.Ativos)
             .HasForeignKey(x => x.BolsaId)

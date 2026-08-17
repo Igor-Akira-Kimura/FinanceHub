@@ -25,19 +25,38 @@ namespace FinanceHub.Domain.Entities
 
         public ICollection<Posicao> Posicoes { get; private set; } = [];
 
+        public decimal Preco { get; private set; }
+
         private Ativo()
         {
         }
 
-        public Ativo(string nome, string ticker, TipoAtivo tipo, Guid bolsaId)
+        public Ativo(string nome, string ticker, TipoAtivo tipo, Guid bolsaId, decimal preco)
         {
             DefinirDados(nome, ticker);
 
+            if (preco <= 0)
+                throw new ArgumentException(
+                    "O preço deve ser maior que zero.",
+                    nameof(preco));
+
+            Id = Guid.NewGuid();
             Tipo = tipo;
             BolsaId = bolsaId;
-
+            Preco = preco;
             EstaAtivo = true;
             DataCriacao = DateTime.UtcNow;
+        }
+
+        public void AtualizarPreco(decimal preco)
+        {
+            if (preco <= 0)
+                throw new ArgumentException(
+                    "O preço deve ser maior que zero.",
+                    nameof(preco));
+
+            Preco = preco;
+            DataAtualizacao = DateTime.UtcNow;
         }
 
         public void Atualizar(string nome, string ticker, TipoAtivo tipo)

@@ -20,22 +20,27 @@ namespace FinanceHub.Domain.Entities
 
         public ICollection<Posicao> Posicoes { get; private set; } = [];
 
+        public decimal Saldo { get; private set; }
+
         private Carteira() { }
 
         public Carteira(
             string nome,
             Guid usuarioId)
         {
+            if (usuarioId == Guid.Empty)
+                throw new ArgumentException(
+                    "Usuário inválido.",
+                    nameof(usuarioId));
+
             DefinirDados(nome);
 
             Id = Guid.NewGuid();
-
             UsuarioId = usuarioId;
-
             Ativa = true;
-
             DataCriacao = DateTime.UtcNow;
             DataAtualizacao = null;
+            Saldo = 0m;
         }
 
         public void Atualizar(string nome)

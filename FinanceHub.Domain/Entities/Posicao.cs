@@ -30,6 +30,16 @@ namespace FinanceHub.Domain.Entities
 
         public Posicao(Guid carteiraId, Guid ativoId, decimal quantidade, decimal precoMedio)
         {
+            if (carteiraId == Guid.Empty)
+                throw new ArgumentException(
+                    "Carteira inválida.",
+                    nameof(carteiraId));
+
+            if (ativoId == Guid.Empty)
+                throw new ArgumentException(
+                    "Ativo inválido.",
+                    nameof(ativoId));
+
             DefinirDados(quantidade, precoMedio);
 
             Id = Guid.NewGuid();

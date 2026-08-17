@@ -13,6 +13,8 @@ public class AtivoBuilder
 
     private Guid _bolsaId = Guid.NewGuid();
 
+    private decimal _preco = 100m;
+
     public AtivoBuilder ComNome(string nome)
     {
         _nome = nome;
@@ -37,12 +39,19 @@ public class AtivoBuilder
         return this;
     }
 
+    public AtivoBuilder ComPreco(decimal preco)
+    {
+        _preco = preco;
+        return this;
+    }
+
     public Ativo Build()
     {
         return new Ativo(
             _nome,
             _ticker,
             _tipo,
-            _bolsaId);
+            _bolsaId,
+            _preco);
     }
 }
