@@ -14,6 +14,9 @@ public static class RepositoryExtensions
         services.AddScoped<ICarteiraRepository, CarteiraRepository>();
         services.AddScoped<IPosicaoRepository, PosicaoRepository>();
         services.AddScoped<IMovimentacaoRepository, MovimentacaoRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<ICompraRepository, CompraRepository>();
+        services.AddScoped<IOutboxRepository, OutboxRepository>();
 
         return services;
     }

@@ -14,6 +14,8 @@ namespace FinanceHub.Application.Interfaces.Repositories
 
         Task<IEnumerable<Carteira>> BuscarTodasAsync(Guid usuarioId);
 
+        Task<int> DebitarSaldoAsync(Guid carteiraId, decimal valor);
+
         Task SalvarAlteracoesAsync();
     }
 }

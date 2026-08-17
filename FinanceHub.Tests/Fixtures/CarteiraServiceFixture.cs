@@ -30,6 +30,12 @@ public class CarteiraServiceFixture
 
     public Mock<IValidator<VenderAtivoRequest>> VenderValidator { get; } = new();
 
+    public Mock<IUnitOfWork> UnitOfWork { get; } = new();
+
+    public Mock<ICompraRepository> CompraRepository { get; } = new();
+
+    public Mock<IOutboxRepository> OutboxRepository { get; } = new();
+
     public CarteiraService Service { get; }
 
     public CarteiraServiceFixture()
@@ -42,7 +48,10 @@ public class CarteiraServiceFixture
             MovimentacaoRepository.Object,
             ComprarValidator.Object,
             VenderValidator.Object,
-            CurrentUserService.Object);
+            CurrentUserService.Object,
+            UnitOfWork.Object,
+            CompraRepository.Object,
+            OutboxRepository.Object);
 
         ComprarValidator
             .Setup(x => x.ValidateAsync(

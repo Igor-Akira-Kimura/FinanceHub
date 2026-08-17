@@ -1,4 +1,5 @@
-﻿using FinanceHub.Domain.Entities;
+﻿using FinanceHub.Application.Common.Outbox;
+using FinanceHub.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceHub.Infrastructure.Data;
@@ -28,4 +29,8 @@ public class AppDbContext : DbContext
     public DbSet<Posicao> Posicoes { get; set; }
 
     public DbSet<Movimentacao> Movimentacoes { get; set; }
+
+    public DbSet<Compra> Compras { get; set; }
+
+    public DbSet<OutboxMessage> OutboxMessages { get; set; }
 }

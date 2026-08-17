@@ -28,11 +28,16 @@ namespace FinanceHub.Application.Services
             if (carteira is null)
                 throw new CarteiraNaoEncontradaException(request.CarteiraId);
 
+            var ativo = await _ativoRepository.BuscarPorIdAsync(request.AtivoId);
+
+            if (ativo is null)
+                throw new AtivoNaoEncontradoException(request.AtivoId);
+
             var posicao = await _posicaoRepository.BuscarPorCarteiraEAtivoAsync(request.CarteiraId, request.AtivoId);
 
             if (posicao is not null)
             {
-                var movimentacao = posicao.Comprar(request.Quantidade, request.Preco);
+                var movimentacao = posicao.Comprar(request.Quantidade, ativo.Preco);
 
                 await _movimentacaoRepository.CriarAsync(movimentacao);
 
@@ -40,7 +45,7 @@ namespace FinanceHub.Application.Services
             }
             else
             {
-                posicao = new Posicao(request.CarteiraId, request.AtivoId, request.Quantidade, request.Preco);
+                posicao = new Posicao(request.CarteiraId, request.AtivoId, request.Quantidade, ativo.Preco);
                 await _posicaoRepository.CriarAsync(posicao);
             }
         }

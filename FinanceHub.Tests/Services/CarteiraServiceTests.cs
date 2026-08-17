@@ -135,8 +135,7 @@ public class CarteiraServiceTests
         {
             CarteiraId = carteira.Id,
             AtivoId = ativo.Id,
-            Quantidade = 10,
-            Preco = 20
+            Quantidade = 10
         };
 
         // Act
@@ -192,8 +191,7 @@ public class CarteiraServiceTests
         {
             CarteiraId = carteira.Id,
             AtivoId = ativo.Id,
-            Quantidade = 5,
-            Preco = 30
+            Quantidade = 5
         };
 
         await fixture.Service.ComprarAtivoAsync(request);
@@ -224,8 +222,7 @@ public class CarteiraServiceTests
         {
             CarteiraId = Guid.NewGuid(),
             AtivoId = Guid.NewGuid(),
-            Quantidade = 10,
-            Preco = 20
+            Quantidade = 10
         };
 
         Func<Task> act =
@@ -254,8 +251,7 @@ public class CarteiraServiceTests
         {
             CarteiraId = carteira.Id,
             AtivoId = Guid.NewGuid(),
-            Quantidade = 10,
-            Preco = 20
+            Quantidade = 10
         };
 
         Func<Task> act =
@@ -292,8 +288,7 @@ public class CarteiraServiceTests
         {
             CarteiraId = carteira.Id,
             AtivoId = ativo.Id,
-            Quantidade = 10,
-            Preco = 20
+            Quantidade = 10
         };
 
         await fixture.Service.ComprarAtivoAsync(request);

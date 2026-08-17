@@ -16,6 +16,10 @@ namespace FinanceHub.Infrastructure.Data.Configurations
                 .IsRequired()
                 .HasMaxLength(100);
 
+            builder.Property(c => c.Saldo)
+                .IsRequired()
+                .HasPrecision(18, 4);
+
             builder.Property(c => c.Ativa)
                 .IsRequired();
 

@@ -8,8 +8,8 @@ namespace FinanceHub.Application.Interfaces.Repositories
 
         Task<Posicao?> BuscarPorCarteiraEAtivoAsync(Guid carteiraId, Guid ativoId);
 
-        Task SalvarAlteracoesAsync();
-
         Task RemoverAsync(Posicao posicao);
+
+        Task SalvarAlteracoesAsync();
     }
 }

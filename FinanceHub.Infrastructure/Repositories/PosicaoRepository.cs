@@ -23,16 +23,16 @@ namespace FinanceHub.Infrastructure.Repositories
             return await _dbContext.Posicoes.FirstOrDefaultAsync(p => p.CarteiraId == carteiraId && p.AtivoId == ativoId);
         }
 
-        public async Task SalvarAlteracoesAsync()
-        {
-            await _dbContext.SaveChangesAsync();
-        }
-
         public Task RemoverAsync(Posicao posicao)
         {
             _dbContext.Posicoes.Remove(posicao);
 
             return Task.CompletedTask;
+        }
+
+        public async Task SalvarAlteracoesAsync()
+        {
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
