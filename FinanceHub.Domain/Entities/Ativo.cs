@@ -35,6 +35,11 @@ namespace FinanceHub.Domain.Entities
         {
             DefinirDados(nome, ticker);
 
+            if (bolsaId == Guid.Empty)
+                throw new ArgumentException(
+                    "Bolsa inválida.",
+                    nameof(bolsaId));
+
             if (preco <= 0)
                 throw new ArgumentException(
                     "O preço deve ser maior que zero.",
