@@ -68,6 +68,18 @@ namespace FinanceHub.Infrastructure.Repositories
                         c => c.Saldo - valor));
         }
 
+        public async Task<int> CreditarSaldoAsync(Guid carteiraId, decimal valor)
+        {
+            return await _context.Carteiras
+                .Where(c =>
+                    c.Id == carteiraId &&
+                    c.Ativa)
+                .ExecuteUpdateAsync(setters =>
+                    setters.SetProperty(
+                        c => c.Saldo,
+                        c => c.Saldo + valor));
+        }
+
         public async Task SalvarAlteracoesAsync()
         {
             await _context.SaveChangesAsync();

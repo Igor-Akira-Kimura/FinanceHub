@@ -31,16 +31,16 @@ namespace FinanceHub.Application.Services
         {
             await _validator.ValidateAndThrowAsync(request);
 
+            var usuarioExistente = await _repository.BuscarPorEmailAsync(request.Email);
+
+            if (usuarioExistente is not null)
+            {
+                throw new EmailJaCadastradoException(request.Email);
+            }
+
             var senhaHash = _passwordHasher.Hash(request.Senha);
 
             var usuario = new Usuario(request.Nome, request.Email, senhaHash);
-
-            var usuarioExistente = await _repository.BuscarPorEmailAsync(usuario.Email);
-
-            if (usuarioExistente != null)
-            {
-                throw new EmailJaCadastradoException(usuario.Email);
-            }
 
             await _repository.AdicionarAsync(usuario);
 
