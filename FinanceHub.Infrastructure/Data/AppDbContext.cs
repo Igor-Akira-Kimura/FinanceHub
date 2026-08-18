@@ -33,4 +33,6 @@ public class AppDbContext : DbContext
     public DbSet<Compra> Compras { get; set; }
 
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
+
+    public DbSet<ProcessedEvent> ProcessedEvents { get; set; }
 }
