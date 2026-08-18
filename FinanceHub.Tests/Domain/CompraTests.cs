@@ -144,4 +144,132 @@ public class CompraTests
             .Throw<ArgumentException>()
             .WithParameterName("preco");
     }
+
+    [Fact]
+    public void Vender_DeveDiminuirQuantidade()
+    {
+        // Arrange
+
+        var posicao = new Posicao(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            10,
+            20);
+
+        // Act
+
+        posicao.Vender(4, 40);
+
+        // Assert
+
+        posicao.Quantidade.Should().Be(6);
+
+        posicao.DataAtualizacao.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void Vender_NaoDeveAlterarPrecoMedio()
+    {
+        // Arrange
+
+        var posicao = new Posicao(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            10,
+            20);
+
+        // Act
+
+        posicao.Vender(4, 40);
+
+        // Assert
+
+        posicao.PrecoMedio.Should().Be(20);
+    }
+
+    [Fact]
+    public void Vender_QuantidadeMenorOuIgualAZero_DeveLancarArgumentException()
+    {
+        // Arrange
+
+        var posicao = new Posicao(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            10,
+            20);
+
+        // Act
+
+        Action act = () => posicao.Vender(0, 30);
+
+        // Assert
+
+        act.Should()
+            .Throw<ArgumentException>()
+            .WithParameterName("quantidade");
+    }
+
+    [Fact]
+    public void Comprar_QuantidadeMenorOuIgualAZero_DeveLancarArgumentException()
+    {
+        // Arrange
+
+        var posicao = new Posicao(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            10,
+            20);
+
+        // Act
+
+        Action act = () => posicao.Comprar(0, 30);
+
+        // Assert
+
+        act.Should()
+            .Throw<ArgumentException>()
+            .WithParameterName("quantidade");
+    }
+
+    [Fact]
+    public void Comprar_PrecoMenorOuIgualAZero_DeveLancarArgumentException()
+    {
+        // Arrange
+
+        var posicao = new Posicao(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            10,
+            20);
+
+        // Act
+
+        Action act = () => posicao.Comprar(5, 0);
+
+        // Assert
+
+        act.Should()
+            .Throw<ArgumentException>()
+            .WithParameterName("preco");
+    }
+
+    [Fact]
+    public void Comprar_DeveCalcularPrecoMedioCorretamente()
+    {
+        // Arrange
+
+        var posicao = new Posicao(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            10,
+            20);
+
+        // Act
+
+        posicao.Comprar(10, 40);
+
+        // Assert
+
+        posicao.PrecoMedio.Should().Be(30);
+    }
 }

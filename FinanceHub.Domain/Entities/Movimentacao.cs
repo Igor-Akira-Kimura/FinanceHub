@@ -20,6 +20,9 @@ namespace FinanceHub.Domain.Entities
 
         private Movimentacao(Guid posicaoId, TipoMovimentacao tipo, decimal quantidade, decimal preco)
         {
+            if (posicaoId == Guid.Empty)
+                throw new ArgumentException("Posição inválida.", nameof(posicaoId));
+
             if (quantidade <= 0)
                 throw new ArgumentException("A quantidade deve ser maior que zero.", nameof(quantidade));
 
