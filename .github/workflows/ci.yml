@@ -26,22 +26,25 @@ jobs:
         ports:
           - 1433:1433
 
-        options: >-
-          --health-cmd "/opt/mssql-tools18/bin/sqlcmd
-            -S localhost
-            -U sa
-            -P 'FinanceHub@123'
-            -C
-            -Q 'SELECT 1'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
-          --health-start-period 30s
-
     steps:
 
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Wait for SQL Server
+        run: |
+          for i in {1..30}; do
+            if (echo > /dev/tcp/127.0.0.1/1433) >/dev/null 2>&1; then
+              echo "SQL Server is accepting connections."
+              exit 0
+            fi
+
+            echo "Waiting for SQL Server..."
+            sleep 2
+          done
+
+          echo "SQL Server did not become available."
+          exit 1
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
