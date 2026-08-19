@@ -8,13 +8,13 @@ public class RabbitMqEventPublisher : IEventPublisher
     private readonly IConnection _connection;
     private readonly IChannel _channel;
 
-    public RabbitMqEventPublisher()
+    public RabbitMqEventPublisher(IConfiguration configuration)
     {
         var factory = new ConnectionFactory
         {
-            HostName = "localhost",
-            UserName = "guest",
-            Password = "guest"
+            HostName = configuration["RabbitMq:HostName"],
+            UserName = configuration["RabbitMq:UserName"],
+            Password = configuration["RabbitMq:Password"]
         };
 
         _connection = factory.CreateConnectionAsync()

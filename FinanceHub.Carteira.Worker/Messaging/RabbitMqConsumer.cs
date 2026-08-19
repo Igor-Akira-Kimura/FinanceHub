@@ -12,10 +12,13 @@ namespace FinanceHub.Carteira.Worker.Messaging;
 public class RabbitMqConsumer : IRabbitMqConsumer
 {
     private readonly IServiceScopeFactory _scopeFactory;
+    
+    private readonly IConfiguration _configuration;
 
-    public RabbitMqConsumer(IServiceScopeFactory scopeFactory)
+    public RabbitMqConsumer(IServiceScopeFactory scopeFactory, IConfiguration configuration)
     {
         _scopeFactory = scopeFactory;
+        _configuration = configuration;
     }
 
     public async Task StartAsync(
@@ -23,9 +26,9 @@ public class RabbitMqConsumer : IRabbitMqConsumer
     {
         var factory = new ConnectionFactory
         {
-            HostName = "localhost",
-            UserName = "guest",
-            Password = "guest"
+            HostName = _configuration["RabbitMq:HostName"],
+            UserName = _configuration["RabbitMq:UserName"],
+            Password = _configuration["RabbitMq:Password"]
         };
 
         var connection =
