@@ -7,7 +7,5 @@
         public Guid AtivoId { get; set; }
 
         public decimal Quantidade { get; set; }
-
-        public decimal Preco { get; set; }
     }
 }

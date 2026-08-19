@@ -1,9 +1,11 @@
-﻿using FinanceHub.Domain.Entities;
-using FinanceHub.Domain.Exceptions;
-using FinanceHub.Application.Interfaces.Repositories;
+﻿using FinanceHub.Application.Interfaces.Repositories;
 using FinanceHub.Application.Interfaces.Services;
 using FinanceHub.Application.Requests;
 using FinanceHub.Application.Responses;
+using FinanceHub.Application.Validators;
+using FinanceHub.Domain.Entities;
+using FinanceHub.Domain.Exceptions;
+using FluentValidation;
 
 namespace FinanceHub.Application.Services
 {
@@ -11,15 +13,19 @@ namespace FinanceHub.Application.Services
     {
         private readonly IAtivoRepository _ativoRepository;
         private readonly IBolsaRepository _bolsaRepository;
+        private readonly IValidator<CriarAtivoRequest> _criarAtivoRequestValidator;
 
-        public AtivoService(IAtivoRepository ativoRepository, IBolsaRepository bolsaRepository)
+        public AtivoService(IAtivoRepository ativoRepository, IBolsaRepository bolsaRepository, IValidator<CriarAtivoRequest> criarAtivoRequestValidator)
         {
             _ativoRepository = ativoRepository;
             _bolsaRepository = bolsaRepository;
+            _criarAtivoRequestValidator = criarAtivoRequestValidator;
         }
 
         public async Task<AtivoResponse> CriarAsync(CriarAtivoRequest request)
         {
+            await _criarAtivoRequestValidator.ValidateAndThrowAsync(request);
+
             var ativoExistente = await _ativoRepository.BuscarPorTickerAsync(request.Ticker);
 
             if (ativoExistente is not null)
@@ -27,7 +33,10 @@ namespace FinanceHub.Application.Services
                 throw new TickerJaCadastradoException(request.Ticker);
             }
 
-            _ = await _bolsaRepository.BuscarPorIdAsync(request.BolsaId) ?? throw new BolsaNaoEncontradaException(request.BolsaId);
+            var bolsa = await _bolsaRepository.BuscarPorIdAsync(request.BolsaId);
+
+            if (bolsa is null)
+                throw new BolsaNaoEncontradaException(request.BolsaId);
 
             var ativo = new Ativo(
                 request.Nome,
@@ -40,7 +49,14 @@ namespace FinanceHub.Application.Services
 
             await _ativoRepository.SalvarAlteracoesAsync();
 
-            return AtivoResponse.FromEntity(ativo);
+            return new AtivoResponse
+            {
+                Id = ativo.Id,
+                Nome = ativo.Nome,
+                Ticker = ativo.Ticker,
+                Tipo = ativo.Tipo,
+                Bolsa = bolsa.Nome
+            };
         }
 
         public async Task<AtivoResponse> BuscarPorIdAsync(Guid id)
