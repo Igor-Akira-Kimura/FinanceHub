@@ -14,9 +14,5 @@ public class VenderAtivoRequestValidator : AbstractValidator<VenderAtivoRequest>
         RuleFor(x => x.Quantidade)
             .GreaterThan(0)
             .WithMessage("A quantidade deve ser maior que zero.");
-
-        RuleFor(x => x.Preco)
-            .GreaterThan(0)
-            .WithMessage("O preço deve ser maior que zero.");
     }
 }

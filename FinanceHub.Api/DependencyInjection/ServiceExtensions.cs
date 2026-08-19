@@ -15,7 +15,6 @@ public static class ServiceExtensions
         services.AddScoped<IAtivoService, AtivoService>();
         services.AddScoped<IBolsaService, BolsaService>();
         services.AddScoped<ICarteiraService, CarteiraService>();
-        services.AddScoped<IPosicaoService, PosicaoService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPasswordService, PasswordService>();

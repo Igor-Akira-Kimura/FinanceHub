@@ -16,6 +16,8 @@ namespace FinanceHub.Application.Interfaces.Repositories
 
         Task<int> DebitarSaldoAsync(Guid carteiraId, decimal valor);
 
+        Task<int> CreditarSaldoAsync(Guid carteiraId, decimal valor);
+
         Task SalvarAlteracoesAsync();
     }
 }

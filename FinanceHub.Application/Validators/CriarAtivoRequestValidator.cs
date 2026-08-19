@@ -22,6 +22,10 @@ namespace FinanceHub.Application.Validators
 
             RuleFor(x => x.BolsaId)
                 .NotEmpty();
+
+            RuleFor(x => x.Preco)
+                .GreaterThan(0)
+                .WithMessage("O preço deve ser maior que zero.");
         }
     }
 }

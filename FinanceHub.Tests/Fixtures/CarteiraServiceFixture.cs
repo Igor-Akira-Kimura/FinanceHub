@@ -36,6 +36,8 @@ public class CarteiraServiceFixture
 
     public Mock<IOutboxRepository> OutboxRepository { get; } = new();
 
+    public Mock<IValidator<CriarCarteiraRequest>> CriarCarteiraValidator { get; } = new();
+
     public CarteiraService Service { get; }
 
     public CarteiraServiceFixture()
@@ -51,7 +53,8 @@ public class CarteiraServiceFixture
             CurrentUserService.Object,
             UnitOfWork.Object,
             CompraRepository.Object,
-            OutboxRepository.Object);
+            OutboxRepository.Object,
+            CriarCarteiraValidator.Object);
 
         ComprarValidator
             .Setup(x => x.ValidateAsync(

@@ -26,8 +26,9 @@ namespace FinanceHub.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICompraRepository _compraRepository;
         private readonly IOutboxRepository _outboxRepository;
+        private readonly IValidator<CriarCarteiraRequest> _criarCarteiraValidator;
 
-        public CarteiraService(ICarteiraRepository carteiraRepository, IUsuarioRepository usuarioRepository, IAtivoRepository ativoRepository, IPosicaoRepository posicaoRepository, IMovimentacaoRepository movimentacaoRepository, IValidator<ComprarAtivoRequest> comprarAtivoRequestValidator, IValidator<VenderAtivoRequest> venderAtivoRequestValidator, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICompraRepository compraRepository, IOutboxRepository outboxRepository)
+        public CarteiraService(ICarteiraRepository carteiraRepository, IUsuarioRepository usuarioRepository, IAtivoRepository ativoRepository, IPosicaoRepository posicaoRepository, IMovimentacaoRepository movimentacaoRepository, IValidator<ComprarAtivoRequest> comprarAtivoRequestValidator, IValidator<VenderAtivoRequest> venderAtivoRequestValidator, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICompraRepository compraRepository, IOutboxRepository outboxRepository, IValidator<CriarCarteiraRequest> criarCarteiraRequestValidator)
         {
             _carteiraRepository = carteiraRepository;
             _usuarioRepository = usuarioRepository;
@@ -40,10 +41,13 @@ namespace FinanceHub.Application.Services
             _unitOfWork = unitOfWork;
             _compraRepository = compraRepository;
             _outboxRepository = outboxRepository;
+            _criarCarteiraValidator = criarCarteiraRequestValidator;
         }
 
         public async Task<Guid> CriarAsync(CriarCarteiraRequest request)
         {
+            await _criarCarteiraValidator.ValidateAndThrowAsync(request);
+
             var usuario = await _usuarioRepository.BuscarPorIdAsync(_currentUserService.Usuario.Id);
             if (usuario is null)
                 throw new UsuarioNaoEncontradoException(_currentUserService.Usuario.Id);
@@ -105,6 +109,9 @@ namespace FinanceHub.Application.Services
             if (carteira is null)
                 throw new CarteiraNaoEncontradaException(id);
 
+            if (carteira.UsuarioId != _currentUserService.Usuario.Id)
+                throw new CarteiraNaoPertenceAoUsuarioException(id);
+
             return new CarteiraResponse
             {
                 Id = carteira.Id,
@@ -122,6 +129,10 @@ namespace FinanceHub.Application.Services
 
             if (carteira is null)
                 throw new CarteiraNaoEncontradaException(
+                    request.CarteiraId);
+
+            if (carteira.UsuarioId != _currentUserService.Usuario.Id)
+                throw new CarteiraNaoPertenceAoUsuarioException(
                     request.CarteiraId);
 
             var ativo = await _ativoRepository
@@ -227,6 +238,16 @@ namespace FinanceHub.Application.Services
             if (carteira is null)
                 throw new CarteiraNaoEncontradaException(request.CarteiraId);
 
+            if (carteira.UsuarioId != _currentUserService.Usuario.Id)
+                throw new CarteiraNaoPertenceAoUsuarioException(
+                    request.CarteiraId);
+
+            var ativo = await _ativoRepository.BuscarPorIdAsync(request.AtivoId);
+
+            if (ativo is null)
+                throw new AtivoNaoEncontradoException(
+                    request.AtivoId);
+
             var posicao = await _posicaoRepository.BuscarPorCarteiraEAtivoAsync(
                 request.CarteiraId,
                 request.AtivoId);
@@ -234,15 +255,27 @@ namespace FinanceHub.Application.Services
             if (posicao is null)
                 throw new PosicaoNaoEncontradaException(request.AtivoId);
 
+            var valorTotal = request.Quantidade * ativo.Preco;
+
             var movimentacao = posicao.Vender(
                 request.Quantidade,
-                request.Preco);
+                ativo.Preco);
 
             await _unitOfWork.BeginTransactionAsync();
 
             try
             {
                 await _movimentacaoRepository.CriarAsync(movimentacao);
+
+                var linhasAfetadas =
+                    await _carteiraRepository
+                        .CreditarSaldoAsync(
+                            request.CarteiraId,
+                            valorTotal);
+
+                if (linhasAfetadas == 0)
+                    throw new CarteiraNaoEncontradaException(
+                        request.CarteiraId);
 
                 await _unitOfWork.CommitAsync();
             }
