@@ -61,3 +61,6 @@ jobs:
         env:
           TEST_DATABASE_CONNECTION_STRING: "Server=localhost,1433;Database=FinanceHubTestDb;User Id=sa;Password=FinanceHub@123;TrustServerCertificate=True;"
         run: dotnet test --no-build --configuration Release
+
+      - name: Docker Build
+        run: docker build -t financehub-api:ci -f Dockerfile .
