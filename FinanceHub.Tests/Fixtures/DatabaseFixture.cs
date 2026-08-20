@@ -5,12 +5,13 @@ namespace FinanceHub.Tests.Fixtures;
 
 public class DatabaseFixture : IAsyncLifetime
 {
-    private const string ConnectionString =
-        "Server=localhost,1433;" +
-        "Database=FinanceHubTestDb;" +
-        "User Id=sa;" +
-        "Password=FinanceHub@123;" +
-        "TrustServerCertificate=True;";
+    private static string ConnectionString =>
+        Environment.GetEnvironmentVariable(
+            "TEST_DATABASE_CONNECTION_STRING")
+        ?? "Server=(localdb)\\MSSQLLocalDB;" +
+           "Database=FinanceHubTestDb;" +
+           "Trusted_Connection=True;" +
+           "TrustServerCertificate=True;";
 
     public DbContextOptions<AppDbContext> Options { get; }
 

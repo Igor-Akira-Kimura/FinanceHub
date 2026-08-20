@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - ci/github-actions
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  build-and-test:
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: FinanceHub@123
+
+        ports:
+          - 1433:1433
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Wait for SQL Server
+        run: |
+          for i in {1..30}; do
+            if (echo > /dev/tcp/127.0.0.1/1433) >/dev/null 2>&1; then
+              echo "SQL Server is accepting connections."
+              exit 0
+            fi
+
+            echo "Waiting for SQL Server..."
+            sleep 2
+          done
+
+          echo "SQL Server did not become available."
+          exit 1
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        env:
+          TEST_DATABASE_CONNECTION_STRING: "Server=localhost,1433;Database=FinanceHubTestDb;User Id=sa;Password=FinanceHub@123;TrustServerCertificate=True;"
+        run: dotnet test --no-build --configuration Release
+
+      - name: Docker Build
+        run: docker build -t financehub-api:ci -f Dockerfile .
+
+      - name: Login to GHCR
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag Docker Image
+        if: github.event_name == 'push'
+        run: docker tag financehub-api:ci ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/financehub-api:${GITHUB_SHA}
+
+      - name: Push Docker Image
+        if: github.event_name == 'push'
+        run: docker push ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/financehub-api:${GITHUB_SHA}
+
+
+  deploy:
+
+    needs: build-and-test
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull Docker Image
+        run: docker pull ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/financehub-api:${GITHUB_SHA}
+
+      - name: Run Docker Container
+        run: |
+          docker run -d \
+            --name financehub-api \
+            -p 8080:8080 \
+            ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/financehub-api:${GITHUB_SHA}
+
+      - name: Check Container
+        run: docker ps
