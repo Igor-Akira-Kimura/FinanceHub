@@ -118,5 +118,18 @@ jobs:
             -p 8080:8080 \
             ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/financehub-api:${GITHUB_SHA}
 
-      - name: Check Container
-        run: docker ps
+      - name: Health Check
+        run: |
+          for i in {1..30}; do
+            if curl --fail http://localhost:8080/health; then
+              echo "FinanceHub is healthy."
+              exit 0
+            fi
+
+            echo "Waiting for FinanceHub..."
+            sleep 2
+          done
+
+          echo "FinanceHub did not become healthy."
+          docker logs financehub-api
+          exit 1
