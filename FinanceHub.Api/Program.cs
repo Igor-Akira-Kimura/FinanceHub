@@ -20,7 +20,8 @@ public class Program
             .AddRepositories()
             .AddDatabase(builder.Configuration)
             .AddJwtAuthentication(builder.Configuration)
-            .AddExceptionHandlers();
+            .AddExceptionHandlers()
+            .AddHealthChecks();
 
         var app = builder.Build();
 
@@ -39,6 +40,8 @@ public class Program
         app.UseAuthorization();
 
         app.MapControllers();
+
+        app.MapHealthChecks("/health");
 
         app.Run();
     }
