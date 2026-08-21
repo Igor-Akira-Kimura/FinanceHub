@@ -7,19 +7,39 @@ processamento assíncrono, containers e CI/CD.
 
 ## Tecnologias
 
+### Backend
+
 - C#
 - .NET 9
 - ASP.NET Core
 - Entity Framework Core
+- FluentValidation
+- JWT
+- LINQ
+
+### Banco de dados
+
 - SQL Server
+
+### Mensageria e processamento assíncrono
+
 - RabbitMQ
+- Outbox Pattern
+- Workers
+
+### Testes
+
+- xUnit
+- Testes unitários
+- Testes de integração
+
+### Infraestrutura
+
 - Docker
 - Docker Compose
 - GitHub Actions
 - GitHub Container Registry
-- JWT
-- FluentValidation
-- xUnit
+- AWS
 
 ## Arquitetura
 
