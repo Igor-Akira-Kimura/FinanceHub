@@ -10,5 +10,7 @@ namespace FinanceHub.Application.Interfaces.Repositories
     public interface ICompraRepository
     {
         Task CriarAsync(Compra compra);
+
+        Task<Compra?> BuscarPorIdempotencyKeyAsync(string idempotencyKey);
     }
 }

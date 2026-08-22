@@ -1,5 +1,10 @@
-﻿using FinanceHub.Domain.Entities;
+﻿using FinanceHub.Application.Common;
+using FinanceHub.Application.Common.Outbox;
+using FinanceHub.Application.Requests.Carteiras;
+using FinanceHub.Domain.Entities;
 using FluentAssertions;
+using Moq;
+using System.Runtime.ConstrainedExecution;
 
 namespace FinanceHub.Tests.Domain;
 
@@ -16,13 +21,16 @@ public class CompraTests
         var quantidade = 10;
         var preco = 20m;
 
+        var idempotencyKey = Guid.NewGuid().ToString();
+
         // Act
 
         var compra = new Compra(
             carteiraId,
             ativoId,
             quantidade,
-            preco);
+            preco,
+            idempotencyKey);
 
         // Assert
 
@@ -42,11 +50,14 @@ public class CompraTests
     {
         // Arrange
 
+        var idempotencyKey = Guid.NewGuid().ToString();
+
         Action act = () => new Compra(
             Guid.Empty,
             Guid.NewGuid(),
             10,
-            20m);
+            20m,
+            idempotencyKey);
 
         // Assert
 
@@ -60,11 +71,14 @@ public class CompraTests
     {
         // Arrange
 
+        var idempotencyKey = Guid.NewGuid().ToString();
+
         Action act = () => new Compra(
             Guid.NewGuid(),
             Guid.Empty,
             10,
-            20m);
+            20m,
+            idempotencyKey);
 
         // Assert
 
@@ -78,11 +92,14 @@ public class CompraTests
     {
         // Arrange
 
+        var idempotencyKey = Guid.NewGuid().ToString();
+
         Action act = () => new Compra(
             Guid.NewGuid(),
             Guid.NewGuid(),
             0,
-            20m);
+            20m,
+            idempotencyKey);
 
         // Assert
 
@@ -96,11 +113,14 @@ public class CompraTests
     {
         // Arrange
 
+        var idempotencyKey = Guid.NewGuid().ToString();
+
         Action act = () => new Compra(
             Guid.NewGuid(),
             Guid.NewGuid(),
             -1,
-            20m);
+            20m,
+            idempotencyKey);
 
         // Assert
 
@@ -114,11 +134,14 @@ public class CompraTests
     {
         // Arrange
 
+        var idempotencyKey = Guid.NewGuid().ToString();
+
         Action act = () => new Compra(
             Guid.NewGuid(),
             Guid.NewGuid(),
             10,
-            0m);
+            0m,
+            idempotencyKey);
 
         // Assert
 
@@ -132,11 +155,14 @@ public class CompraTests
     {
         // Arrange
 
+        var idempotencyKey = Guid.NewGuid().ToString();
+
         Action act = () => new Compra(
             Guid.NewGuid(),
             Guid.NewGuid(),
             10,
-            -10m);
+            -10m,
+            idempotencyKey);
 
         // Assert
 

@@ -1109,4 +1109,91 @@ public class CarteiraServiceTests
                 It.IsAny<decimal>()),
             Times.Never);
     }
+
+    [Fact]
+    public async Task ComprarAtivoAsync_ComIdempotencyKeyJaProcessada_NaoDeveProcessarNovamente()
+    {
+        // Arrange
+        var carteira = new Carteira(
+            "Carteira teste",
+            _usuarioId);
+
+        var ativo = new Ativo(
+            "PETR4",
+            "Petrobras",
+            TipoAtivo.Acao,
+            Guid.NewGuid(),
+            100m);
+
+        var idempotencyKey = "ABC-123";
+
+        var request = new ComprarAtivoRequest
+        {
+            CarteiraId = carteira.Id,
+            AtivoId = ativo.Id,
+            Quantidade = 5,
+            IdempotencyKey = idempotencyKey
+        };
+
+        var compraExistente = new Compra(
+            carteira.Id,
+            ativo.Id,
+            5,
+            100m,
+            idempotencyKey);
+
+        _carteiraRepository
+            .Setup(x => x.BuscarPorIdAsync(carteira.Id))
+            .ReturnsAsync(carteira);
+
+        _ativoRepository
+            .Setup(x => x.BuscarPorIdAsync(ativo.Id))
+            .ReturnsAsync(ativo);
+
+        _compraRepository
+            .Setup(x => x.BuscarPorIdempotencyKeyAsync(idempotencyKey))
+            .ReturnsAsync(compraExistente);
+
+        var service = CriarService();
+
+        // Act
+
+        await service.ComprarAtivoAsync(request);
+
+        // Assert
+
+        _carteiraRepository.Verify(
+            x => x.DebitarSaldoAsync(
+                It.IsAny<Guid>(),
+                It.IsAny<decimal>()),
+            Times.Never);
+
+        _posicaoRepository.Verify(
+            x => x.CriarAsync(It.IsAny<Posicao>()),
+            Times.Never);
+
+        _movimentacaoRepository.Verify(
+            x => x.CriarAsync(It.IsAny<Movimentacao>()),
+            Times.Never);
+
+        _compraRepository.Verify(
+            x => x.CriarAsync(It.IsAny<Compra>()),
+            Times.Never);
+
+        _outboxRepository.Verify(
+            x => x.CriarAsync(It.IsAny<OutboxMessage>()),
+            Times.Never);
+
+        _unitOfWork.Verify(
+            x => x.BeginTransactionAsync(),
+            Times.Never);
+
+        _unitOfWork.Verify(
+            x => x.CommitAsync(),
+            Times.Never);
+
+        _unitOfWork.Verify(
+            x => x.RollbackAsync(),
+            Times.Never);
+    }
 }

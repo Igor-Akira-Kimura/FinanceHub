@@ -26,6 +26,10 @@ public class CompraConfiguration : IEntityTypeConfiguration<Compra>
             .IsRequired()
             .HasPrecision(18, 4);
 
+        builder.Property(c => c.IdempotencyKey)
+            .IsRequired()
+            .HasMaxLength(450);
+
         builder.HasOne<Carteira>()
             .WithMany()
             .HasForeignKey(c => c.CarteiraId)
@@ -39,5 +43,10 @@ public class CompraConfiguration : IEntityTypeConfiguration<Compra>
         builder.HasIndex(c => c.CarteiraId);
 
         builder.HasIndex(c => c.AtivoId);
+
+        builder
+            .HasIndex(c => c.IdempotencyKey)
+            .IsUnique()
+            .HasDatabaseName("UX_Compras_IdempotencyKey");
     }
 }

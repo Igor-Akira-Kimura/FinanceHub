@@ -1,0 +1,125 @@
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Connections;
+using RabbitMQ.Client;
+using System.Text;
+
+namespace FinanceHub.Tests.Integration;
+
+public class RabbitMqRetryTests
+{
+    private const string ExchangeName =
+        "financehub.events";
+
+    private const string RoutingKey =
+        "compra.criada";
+
+    private const string DeadLetterQueue =
+        "financehub.compra.criada.dlq";
+
+    [Fact]
+    public async Task
+        MensagemComErro_AposNumeroMaximoDeRetries_DeveIrParaDLQ()
+    {
+        // Arrange
+
+        var factory = new ConnectionFactory
+        {
+            HostName =
+                Environment.GetEnvironmentVariable(
+                    "RABBITMQ_HOST")
+                ?? "localhost",
+
+            UserName =
+                Environment.GetEnvironmentVariable(
+                    "RABBITMQ_USERNAME")
+                ?? "guest",
+
+            Password =
+                Environment.GetEnvironmentVariable(
+                    "RABBITMQ_PASSWORD")
+                ?? "guest"
+        };
+
+        await using var connection =
+            await factory.CreateConnectionAsync();
+
+        await using var channel =
+            await connection.CreateChannelAsync();
+
+        // Mensagem propositalmente inválida.
+        // O Consumer não conseguirá desserializar.
+        var mensagemInvalida =
+            """
+            {
+                "isso": "não é um CompraCriadaEvent válido"
+            }
+            """;
+
+        var body =
+            Encoding.UTF8.GetBytes(
+                mensagemInvalida);
+
+        // Limpa mensagens antigas da DLQ
+        while (true)
+        {
+            var mensagem =
+                await channel.BasicGetAsync(
+                    DeadLetterQueue,
+                    autoAck: true);
+
+            if (mensagem is null)
+                break;
+        }
+
+        // Act
+
+        await channel.BasicPublishAsync(
+            exchange: ExchangeName,
+            routingKey: RoutingKey,
+            mandatory: true,
+            basicProperties: new BasicProperties
+            {
+                Persistent = true,
+                ContentType = "application/json"
+            },
+            body: body);
+
+        // Espera a mensagem passar pelos retries
+        BasicGetResult? mensagemNaDlq = null;
+
+        for (var tentativa = 0;
+             tentativa < 20;
+             tentativa++)
+        {
+            await Task.Delay(500);
+
+            mensagemNaDlq =
+                await channel.BasicGetAsync(
+                    DeadLetterQueue,
+                    autoAck: false);
+
+            if (mensagemNaDlq is not null)
+                break;
+        }
+
+        // Assert
+
+        mensagemNaDlq
+            .Should()
+            .NotBeNull(
+                "a mensagem deveria terminar na DLQ após os retries");
+
+        var mensagemRecebida =
+            Encoding.UTF8.GetString(
+                mensagemNaDlq!.Body.ToArray());
+
+        mensagemRecebida
+            .Should()
+            .Contain(
+                "não é um CompraCriadaEvent válido");
+
+        await channel.BasicAckAsync(
+            mensagemNaDlq.DeliveryTag,
+            false);
+    }
+}
