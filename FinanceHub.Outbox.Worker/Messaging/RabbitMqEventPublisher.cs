@@ -8,7 +8,8 @@ public class RabbitMqEventPublisher : IEventPublisher
     private readonly IConnection _connection;
     private readonly IChannel _channel;
 
-    public RabbitMqEventPublisher(IConfiguration configuration)
+    public RabbitMqEventPublisher(
+        IConfiguration configuration)
     {
         var factory = new ConnectionFactory
         {
@@ -31,23 +32,8 @@ public class RabbitMqEventPublisher : IEventPublisher
         string payload,
         CancellationToken cancellationToken)
     {
-        await _channel.ExchangeDeclareAsync(
-            exchange: "financehub.events",
-            type: ExchangeType.Direct,
-            durable: true);
-
-        await _channel.QueueDeclareAsync(
-            queue: "financehub.compra.criada",
-            durable: true,
-            exclusive: false,
-            autoDelete: false);
-
-        await _channel.QueueBindAsync(
-            queue: "financehub.compra.criada",
-            exchange: "financehub.events",
-            routingKey: "compra.criada");
-
-        var body = Encoding.UTF8.GetBytes(payload);
+        var body =
+            Encoding.UTF8.GetBytes(payload);
 
         var properties = new BasicProperties
         {

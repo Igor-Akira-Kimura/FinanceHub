@@ -18,6 +18,8 @@ namespace FinanceHub.Domain.Entities
 
         public decimal Preco { get; private set; }
 
+        public string IdempotencyKey { get; private set; } = null!;
+
         private Compra()
         {
         }
@@ -26,7 +28,8 @@ namespace FinanceHub.Domain.Entities
             Guid carteiraId,
             Guid ativoId,
             decimal quantidade,
-            decimal preco)
+            decimal preco,
+            string idempotencyKey)
         {
             if (carteiraId == Guid.Empty)
                 throw new ArgumentException(
@@ -53,6 +56,7 @@ namespace FinanceHub.Domain.Entities
             AtivoId = ativoId;
             Quantidade = quantidade;
             Preco = preco;
+            IdempotencyKey = idempotencyKey;
         }
     }
 }

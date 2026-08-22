@@ -73,7 +73,8 @@ public class CompraRepositoryTests : IClassFixture<DatabaseFixture>
                 carteira.Id,
                 ativo.Id,
                 10m,
-                35m);
+                35m,
+                Guid.NewGuid().ToString());
 
         var repository =
             new CompraRepository(context);
@@ -127,7 +128,8 @@ public class CompraRepositoryTests : IClassFixture<DatabaseFixture>
                 carteira.Id,
                 ativo.Id,
                 10m,
-                35m);
+                35m,
+                Guid.NewGuid().ToString());
 
         var repository =
             new CompraRepository(context);

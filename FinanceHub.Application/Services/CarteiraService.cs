@@ -150,6 +150,14 @@ namespace FinanceHub.Application.Services
             var valorTotal =
                 request.Quantidade * ativo.Preco;
 
+            var compraExistente =
+                await _compraRepository
+                    .BuscarPorIdempotencyKeyAsync(
+                        request.IdempotencyKey);
+
+            if (compraExistente is not null)
+                return;
+
             await _unitOfWork.BeginTransactionAsync();
 
             try
@@ -197,7 +205,8 @@ namespace FinanceHub.Application.Services
                     request.CarteiraId,
                     request.AtivoId,
                     request.Quantidade,
-                    ativo.Preco);
+                    ativo.Preco,
+                    request.IdempotencyKey);
 
                 await _compraRepository
                     .CriarAsync(compra);
@@ -221,6 +230,11 @@ namespace FinanceHub.Application.Services
                     .CriarAsync(outboxMessage);
 
                 await _unitOfWork.CommitAsync();
+            }
+            catch (IdempotencyKeyJaProcessadaException)
+            {
+                await _unitOfWork.RollbackAsync();
+                return;
             }
             catch
             {
