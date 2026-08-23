@@ -1,6 +1,7 @@
 ﻿using FinanceHub.Application.Common;
 using FinanceHub.Application.Common.Events;
 using FinanceHub.Application.Common.Outbox;
+using FinanceHub.Application.Interfaces.Cache;
 using FinanceHub.Application.Interfaces.Repositories;
 using FinanceHub.Application.Interfaces.Services;
 using FinanceHub.Application.Requests;
@@ -30,7 +31,7 @@ public class CarteiraServiceTests
     private readonly Mock<ICompraRepository> _compraRepository = new();
     private readonly Mock<IOutboxRepository> _outboxRepository = new();
     private readonly CriarCarteiraRequestValidator _criarCarteiraValidator = new();
-
+    private readonly Mock<ICacheService> _cacheService = new();
     private readonly Guid _usuarioId = Guid.NewGuid();
 
     private CarteiraService CriarService()
@@ -56,7 +57,8 @@ public class CarteiraServiceTests
             _unitOfWork.Object,
             _compraRepository.Object,
             _outboxRepository.Object,
-            _criarCarteiraValidator);
+            _criarCarteiraValidator,
+            _cacheService.Object);
     }
 
     [Fact]

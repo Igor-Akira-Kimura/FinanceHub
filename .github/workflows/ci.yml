@@ -20,21 +20,35 @@ jobs:
       contents: read
       packages: write
 
-    services:
-      sqlserver:
-        image: mcr.microsoft.com/mssql/server:2022-latest
-
-        env:
-          ACCEPT_EULA: Y
-          MSSQL_SA_PASSWORD: FinanceHub@123
-
-        ports:
-          - 1433:1433
-
     steps:
 
       - name: Checkout
         uses: actions/checkout@v4
+
+      # =========================================
+      # .NET
+      # =========================================
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      # =========================================
+      # INFRASTRUCTURE
+      # =========================================
+
+      - name: Start infrastructure
+        run: docker compose up -d --build
+
+      - name: Show containers
+        run: docker compose ps
 
       - name: Wait for SQL Server
         run: |
@@ -49,23 +63,68 @@ jobs:
           done
 
           echo "SQL Server did not become available."
+          docker compose logs sqlserver
           exit 1
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 9.0.x
+      - name: Wait for Redis
+        run: |
+          for i in {1..30}; do
+            if (echo > /dev/tcp/127.0.0.1/6379) >/dev/null 2>&1; then
+              echo "Redis is accepting connections."
+              exit 0
+            fi
 
-      - name: Restore
-        run: dotnet restore
+            echo "Waiting for Redis..."
+            sleep 2
+          done
 
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
+          echo "Redis did not become available."
+          docker compose logs redis
+          exit 1
+
+      - name: Wait for RabbitMQ
+        run: |
+          for i in {1..30}; do
+            if (echo > /dev/tcp/127.0.0.1/5672) >/dev/null 2>&1; then
+              echo "RabbitMQ is accepting connections."
+              exit 0
+            fi
+
+            echo "Waiting for RabbitMQ..."
+            sleep 2
+          done
+
+          echo "RabbitMQ did not become available."
+          docker compose logs rabbitmq
+          exit 1
+
+      # =========================================
+      # TESTS
+      # =========================================
 
       - name: Test
         env:
           TEST_DATABASE_CONNECTION_STRING: "Server=localhost,1433;Database=FinanceHubTestDb;User Id=sa;Password=FinanceHub@123;TrustServerCertificate=True;"
+
+          Redis__ConnectionString: "localhost:6379"
+
+          RABBITMQ_HOST: "localhost"
+          RABBITMQ_USERNAME: "guest"
+          RABBITMQ_PASSWORD: "guest"
+
         run: dotnet test --no-build --configuration Release
+
+      # =========================================
+      # DEBUG
+      # =========================================
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs
+
+      # =========================================
+      # DOCKER IMAGE
+      # =========================================
 
       - name: Docker Build
         run: docker build -t financehub-api:ci -f Dockerfile .
@@ -86,6 +145,10 @@ jobs:
         if: github.event_name == 'push'
         run: docker push ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/financehub-api:${GITHUB_SHA}
 
+
+  # =========================================
+  # DEPLOY
+  # =========================================
 
   deploy:
 
