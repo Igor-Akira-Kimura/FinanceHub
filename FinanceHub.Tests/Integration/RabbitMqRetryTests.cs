@@ -63,11 +63,20 @@ public class RabbitMqRetryTests
             exclusive: false,
             autoDelete: false);
 
+        var retryArguments =
+            new Dictionary<string, object?>
+            {
+                ["x-message-ttl"] = 2000,
+                ["x-dead-letter-exchange"] = ExchangeName,
+                ["x-dead-letter-routing-key"] = RoutingKey
+            };
+
         await channel.QueueDeclareAsync(
             queue: RetryQueue,
             durable: true,
             exclusive: false,
-            autoDelete: false);
+            autoDelete: false,
+            arguments: retryArguments);
 
         await channel.QueueDeclareAsync(
             queue: MainQueue,

@@ -16,6 +16,10 @@ public class CustomWebApplicationFactory
         string connectionString)
     {
         _connectionString = connectionString;
+
+        Environment.SetEnvironmentVariable(
+            "Redis__ConnectionString",
+            "localhost:6379");
     }
 
     protected override void ConfigureWebHost(
