@@ -12,10 +12,16 @@ services:
 
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=FinanceHubDb;User Id=sa;Password=FinanceHub@123;TrustServerCertificate=True;"
+
+      Redis__ConnectionString: "redis:6379"
 
     depends_on:
       sqlserver:
+        condition: service_healthy
+
+      redis:
         condition: service_healthy
 
 
@@ -112,6 +118,31 @@ services:
         condition: service_healthy
 
 
+  redis:
+    image: redis:7-alpine
+
+    container_name: financehub-redis
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis_data:/data
+
+    command: redis-server --appendonly yes
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "ping"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   sqlserver_data:
   rabbitmq_data:
+  redis_data:

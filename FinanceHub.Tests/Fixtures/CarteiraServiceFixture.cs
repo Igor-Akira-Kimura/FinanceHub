@@ -9,6 +9,7 @@ using FinanceHub.Tests.Builders;
 using FluentValidation;
 using FluentValidation.Results;
 using Moq;
+using FinanceHub.Application.Interfaces.Cache;
 
 namespace FinanceHub.Tests.Fixtures;
 
@@ -38,6 +39,8 @@ public class CarteiraServiceFixture
 
     public Mock<IValidator<CriarCarteiraRequest>> CriarCarteiraValidator { get; } = new();
 
+    public Mock<ICacheService> CacheService { get; } = new();
+
     public CarteiraService Service { get; }
 
     public CarteiraServiceFixture()
@@ -54,7 +57,8 @@ public class CarteiraServiceFixture
             UnitOfWork.Object,
             CompraRepository.Object,
             OutboxRepository.Object,
-            CriarCarteiraValidator.Object);
+            CriarCarteiraValidator.Object,
+            CacheService.Object);
 
         ComprarValidator
             .Setup(x => x.ValidateAsync(

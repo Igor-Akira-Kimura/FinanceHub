@@ -1,6 +1,8 @@
-﻿using FinanceHub.Application.Common;
+﻿using FinanceHub.Application.Cache;
+using FinanceHub.Application.Common;
 using FinanceHub.Application.Common.Events;
 using FinanceHub.Application.Common.Outbox;
+using FinanceHub.Application.Interfaces.Cache;
 using FinanceHub.Application.Interfaces.Repositories;
 using FinanceHub.Application.Interfaces.Services;
 using FinanceHub.Application.Requests;
@@ -27,8 +29,9 @@ namespace FinanceHub.Application.Services
         private readonly ICompraRepository _compraRepository;
         private readonly IOutboxRepository _outboxRepository;
         private readonly IValidator<CriarCarteiraRequest> _criarCarteiraValidator;
+        private readonly ICacheService _cacheService;
 
-        public CarteiraService(ICarteiraRepository carteiraRepository, IUsuarioRepository usuarioRepository, IAtivoRepository ativoRepository, IPosicaoRepository posicaoRepository, IMovimentacaoRepository movimentacaoRepository, IValidator<ComprarAtivoRequest> comprarAtivoRequestValidator, IValidator<VenderAtivoRequest> venderAtivoRequestValidator, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICompraRepository compraRepository, IOutboxRepository outboxRepository, IValidator<CriarCarteiraRequest> criarCarteiraRequestValidator)
+        public CarteiraService(ICarteiraRepository carteiraRepository, IUsuarioRepository usuarioRepository, IAtivoRepository ativoRepository, IPosicaoRepository posicaoRepository, IMovimentacaoRepository movimentacaoRepository, IValidator<ComprarAtivoRequest> comprarAtivoRequestValidator, IValidator<VenderAtivoRequest> venderAtivoRequestValidator, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICompraRepository compraRepository, IOutboxRepository outboxRepository, IValidator<CriarCarteiraRequest> criarCarteiraRequestValidator, ICacheService cacheService)
         {
             _carteiraRepository = carteiraRepository;
             _usuarioRepository = usuarioRepository;
@@ -42,6 +45,7 @@ namespace FinanceHub.Application.Services
             _compraRepository = compraRepository;
             _outboxRepository = outboxRepository;
             _criarCarteiraValidator = criarCarteiraRequestValidator;
+            _cacheService = cacheService;
         }
 
         public async Task<Guid> CriarAsync(CriarCarteiraRequest request)
@@ -135,12 +139,50 @@ namespace FinanceHub.Application.Services
                 throw new CarteiraNaoPertenceAoUsuarioException(
                     request.CarteiraId);
 
-            var ativo = await _ativoRepository
-                .BuscarPorIdAsync(request.AtivoId);
+            var cacheKey = $"ativo-preco:{request.AtivoId}";
 
-            if (ativo is null)
-                throw new AtivoNaoEncontradoException(
-                    request.AtivoId);
+            var cachedPreco =
+                await _cacheService.GetAsync(cacheKey);
+
+            decimal preco;
+
+            if (cachedPreco is not null)
+            {
+                Console.WriteLine(
+                    $"CACHE HIT: {cacheKey}");
+
+                preco =
+                    JsonSerializer
+                        .Deserialize<AtivoPrecoCache>(
+                            cachedPreco)!
+                        .Preco;
+            }
+            else
+            {
+                Console.WriteLine(
+                    $"CACHE MISS: {cacheKey}");
+
+                var ativo =
+                    await _ativoRepository
+                        .BuscarPorIdAsync(request.AtivoId);
+
+                if (ativo is null)
+                    throw new AtivoNaoEncontradoException(
+                        request.AtivoId);
+
+                preco = ativo.Preco;
+
+                var cache =
+                    new AtivoPrecoCache
+                    {
+                        Preco = preco
+                    };
+
+                await _cacheService.SetAsync(
+                    cacheKey,
+                    JsonSerializer.Serialize(cache),
+                    TimeSpan.FromMinutes(5));
+            }
 
             var posicao = await _posicaoRepository
                 .BuscarPorCarteiraEAtivoAsync(
@@ -148,7 +190,7 @@ namespace FinanceHub.Application.Services
                     request.AtivoId);
 
             var valorTotal =
-                request.Quantidade * ativo.Preco;
+                request.Quantidade * preco;
 
             var compraExistente =
                 await _compraRepository
@@ -181,12 +223,12 @@ namespace FinanceHub.Application.Services
                         request.CarteiraId,
                         request.AtivoId,
                         request.Quantidade,
-                        ativo.Preco);
+                        preco);
 
                     movimentacao = Movimentacao.CriarCompra(
                         posicao.Id,
                         request.Quantidade,
-                        ativo.Preco);
+                        preco);
 
                     await _posicaoRepository
                         .CriarAsync(posicao);
@@ -195,7 +237,7 @@ namespace FinanceHub.Application.Services
                 {
                     movimentacao = posicao.Comprar(
                         request.Quantidade,
-                        ativo.Preco);
+                        preco);
                 }
 
                 await _movimentacaoRepository
@@ -205,7 +247,7 @@ namespace FinanceHub.Application.Services
                     request.CarteiraId,
                     request.AtivoId,
                     request.Quantidade,
-                    ativo.Preco,
+                    preco,
                     request.IdempotencyKey);
 
                 await _compraRepository
