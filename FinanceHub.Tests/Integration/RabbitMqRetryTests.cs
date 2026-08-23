@@ -16,6 +16,12 @@ public class RabbitMqRetryTests
     private const string DeadLetterQueue =
         "financehub.compra.criada.dlq";
 
+    private const string RetryQueue =
+    "financehub.compra.criada.retry";
+
+    private const string MainQueue =
+        "financehub.compra.criada";
+
     [Fact]
     public async Task
         MensagemComErro_AposNumeroMaximoDeRetries_DeveIrParaDLQ()
@@ -45,6 +51,29 @@ public class RabbitMqRetryTests
 
         await using var channel =
             await connection.CreateChannelAsync();
+
+        await channel.ExchangeDeclareAsync(
+            exchange: ExchangeName,
+            type: ExchangeType.Direct,
+            durable: true);
+
+        await channel.QueueDeclareAsync(
+            queue: DeadLetterQueue,
+            durable: true,
+            exclusive: false,
+            autoDelete: false);
+
+        await channel.QueueDeclareAsync(
+            queue: RetryQueue,
+            durable: true,
+            exclusive: false,
+            autoDelete: false);
+
+        await channel.QueueDeclareAsync(
+            queue: MainQueue,
+            durable: true,
+            exclusive: false,
+            autoDelete: false);
 
         // Mensagem propositalmente inválida.
         // O Consumer não conseguirá desserializar.
