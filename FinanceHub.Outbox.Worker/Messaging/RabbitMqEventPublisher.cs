@@ -13,9 +13,20 @@ public class RabbitMqEventPublisher : IEventPublisher
     {
         var factory = new ConnectionFactory
         {
-            HostName = configuration["RabbitMq:HostName"],
-            UserName = configuration["RabbitMq:UserName"],
-            Password = configuration["RabbitMq:Password"]
+            HostName =
+                configuration["RabbitMq:HostName"]
+                ?? throw new InvalidOperationException(
+                    "RabbitMq:HostName não configurado."),
+
+            UserName =
+                configuration["RabbitMq:UserName"]
+                ?? throw new InvalidOperationException(
+                    "RabbitMq:UserName não configurado."),
+
+            Password =
+                configuration["RabbitMq:Password"]
+                ?? throw new InvalidOperationException(
+                    "RabbitMq:Password não configurado.")
         };
 
         _connection = factory.CreateConnectionAsync()
