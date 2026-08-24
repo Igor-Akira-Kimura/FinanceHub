@@ -57,13 +57,19 @@ public class RabbitMqConsumer : IRabbitMqConsumer
         var factory = new ConnectionFactory
         {
             HostName =
-                _configuration["RabbitMq:HostName"],
+                _configuration["RabbitMq:HostName"]
+                    ?? throw new InvalidOperationException(
+                        "RabbitMq:HostName não configurado."),
 
             UserName =
-                _configuration["RabbitMq:UserName"],
+                _configuration["RabbitMq:UserName"]
+                    ?? throw new InvalidOperationException(
+                        "RabbitMq:UserName não configurado."),
 
             Password =
                 _configuration["RabbitMq:Password"]
+                    ?? throw new InvalidOperationException(
+                        "RabbitMq:Password não configurado.")
         };
 
         var connection =
