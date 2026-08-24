@@ -1,5 +1,6 @@
 using FinanceHub.Api.DependencyInjection;
 using FinanceHub.Api.ExceptionHandling;
+using FinanceHub.Api.Middleware;
 using FinanceHub.Application.Interfaces.Cache;
 using FinanceHub.Infrastructure.Cache;
 using StackExchange.Redis;
@@ -17,48 +18,6 @@ public class Program
 
         builder.Services.AddHttpContextAccessor();
 
-        //// =========================================
-        //// REDIS
-        //// =========================================
-
-        //var redisConnectionString =
-        //    builder.Configuration[
-        //        "Redis:ConnectionString"]
-        //    ?? throw new InvalidOperationException(
-        //        "Redis:ConnectionString não configurada.");
-
-        //builder.Services.AddSingleton<IConnectionMultiplexer>(
-        //    ConnectionMultiplexer.Connect(
-        //        redisConnectionString));
-
-        //builder.Services.AddSingleton<ICacheService,
-        //    RedisCacheService>();
-
-        // =========================================
-        // CACHE
-        // =========================================
-
-        var redisConnectionString =
-            builder.Configuration[
-                "Redis:ConnectionString"];
-
-        if (!string.IsNullOrWhiteSpace(redisConnectionString))
-        {
-            builder.Services.AddSingleton<IConnectionMultiplexer>(
-                ConnectionMultiplexer.Connect(
-                    redisConnectionString));
-
-            builder.Services.AddSingleton<ICacheService,
-                RedisCacheService>();
-        }
-        else
-        {
-            builder.Services.AddMemoryCache();
-
-            builder.Services.AddSingleton<ICacheService,
-                MemoryCacheService>();
-        }
-
         // =========================================
         // APPLICATION / INFRASTRUCTURE
         // =========================================
@@ -69,11 +28,15 @@ public class Program
             .AddApplicationServices()
             .AddRepositories()
             .AddDatabase(builder.Configuration)
+            .AddRedis(builder.Configuration)
             .AddJwtAuthentication(builder.Configuration)
+            .AddObservability()
             .AddExceptionHandlers()
             .AddHealthChecks();
 
         var app = builder.Build();
+
+        app.UseMiddleware<CorrelationIdMiddleware>();
 
         app.UseMiddleware<ExceptionMiddleware>();
 
@@ -92,6 +55,8 @@ public class Program
         app.MapControllers();
 
         app.MapHealthChecks("/health");
+
+        app.MapPrometheusScrapingEndpoint();
 
         app.Run();
     }
