@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Connections;
 using RabbitMQ.Client;
 using System.Text;
 
-namespace FinanceHub.Tests.Integration;
+namespace FinanceHub.Tests.Integration.Messaging;
 
 public class RabbitMqRetryTests
 {

@@ -17,6 +17,7 @@ public static class RepositoryExtensions
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ICompraRepository, CompraRepository>();
         services.AddScoped<IOutboxRepository, OutboxRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         return services;
     }

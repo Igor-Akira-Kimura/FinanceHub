@@ -24,8 +24,19 @@ namespace FinanceHub.Infrastructure.Authentication
             {
                 new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
                 new Claim(ClaimTypes.Email, usuario.Email),
-                new Claim(ClaimTypes.Name, usuario.Nome)
+                new Claim(ClaimTypes.Name, usuario.Nome),
+                new Claim(ClaimTypes.Role,usuario.Role.ToString())
             };
+
+            var permissions = RolePermissions.GetPermissions(usuario.Role);
+
+            foreach (var permission in permissions)
+            {
+                claims.Add(
+                    new Claim(
+                        "permission",
+                        permission.ToString()));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
 

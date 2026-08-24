@@ -2,7 +2,7 @@
 using FluentAssertions;
 using StackExchange.Redis;
 
-namespace FinanceHub.Tests.Integration;
+namespace FinanceHub.Tests.Integration.Cache;
 
 public class RedisCacheTests
 {

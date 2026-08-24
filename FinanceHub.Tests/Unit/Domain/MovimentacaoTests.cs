@@ -2,7 +2,7 @@
 using FinanceHub.Domain.Enums;
 using FluentAssertions;
 
-namespace FinanceHub.Tests.Domain;
+namespace FinanceHub.Tests.Unit.Domain;
 
 public class MovimentacaoTests
 {

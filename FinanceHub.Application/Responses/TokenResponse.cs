@@ -1,6 +1,6 @@
-﻿namespace FinanceHub.Application.Responses;
+﻿namespace FinanceHub.Application.Responses.Auth;
 
-public class LoginResponse
+public class TokenResponse
 {
     public string AccessToken { get; set; } = null!;
 

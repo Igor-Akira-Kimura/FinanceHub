@@ -4,6 +4,7 @@ using FinanceHub.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinanceHub.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260824134254_AddUsuarioRole")]
+    partial class AddUsuarioRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -326,39 +329,6 @@ namespace FinanceHub.Infrastructure.Migrations
                     b.ToTable("ProcessedEvents", (string)null);
                 });
 
-            modelBuilder.Entity("FinanceHub.Domain.Entities.RefreshToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("RevokedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<Guid>("UsuarioId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TokenHash")
-                        .IsUnique();
-
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("RefreshTokens", (string)null);
-                });
-
             modelBuilder.Entity("FinanceHub.Domain.Entities.Usuario", b =>
                 {
                     b.Property<Guid>("Id")
@@ -461,17 +431,6 @@ namespace FinanceHub.Infrastructure.Migrations
                     b.Navigation("Carteira");
                 });
 
-            modelBuilder.Entity("FinanceHub.Domain.Entities.RefreshToken", b =>
-                {
-                    b.HasOne("FinanceHub.Domain.Entities.Usuario", "Usuario")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Usuario");
-                });
-
             modelBuilder.Entity("FinanceHub.Domain.Entities.Ativo", b =>
                 {
                     b.Navigation("Posicoes");
@@ -495,8 +454,6 @@ namespace FinanceHub.Infrastructure.Migrations
             modelBuilder.Entity("FinanceHub.Domain.Entities.Usuario", b =>
                 {
                     b.Navigation("Carteiras");
-
-                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

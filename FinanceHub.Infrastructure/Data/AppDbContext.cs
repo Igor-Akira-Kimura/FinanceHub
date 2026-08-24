@@ -35,4 +35,6 @@ public class AppDbContext : DbContext
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
 
     public DbSet<ProcessedEvent> ProcessedEvents { get; set; }
+
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 }

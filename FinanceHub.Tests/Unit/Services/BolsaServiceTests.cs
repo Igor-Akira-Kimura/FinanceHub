@@ -4,7 +4,7 @@ using FinanceHub.Domain.Entities;
 using FluentAssertions;
 using Moq;
 
-namespace FinanceHub.Tests.Application.Services;
+namespace FinanceHub.Tests.Unit.Services;
 
 public class BolsaServiceTests
 {
