@@ -1,6 +1,7 @@
 ﻿using Castle.Core.Logging;
 using FinanceHub.Application.Common;
 using FinanceHub.Application.Interfaces.Cache;
+using FinanceHub.Application.Interfaces.Observability;
 using FinanceHub.Application.Interfaces.Repositories;
 using FinanceHub.Application.Interfaces.Services;
 using FinanceHub.Application.Requests;
@@ -45,6 +46,8 @@ public class CarteiraServiceFixture
 
     public Mock<ILogger<CarteiraService>> _logger = new();
 
+    public Mock<ICompraMetrics> _compraMetrics = new();
+
     public CarteiraService Service { get; }
 
     public CarteiraServiceFixture()
@@ -63,7 +66,8 @@ public class CarteiraServiceFixture
             OutboxRepository.Object,
             CriarCarteiraValidator.Object,
             CacheService.Object,
-            _logger.Object);
+            _logger.Object,
+            _compraMetrics.Object);
 
         ComprarValidator
             .Setup(x => x.ValidateAsync(

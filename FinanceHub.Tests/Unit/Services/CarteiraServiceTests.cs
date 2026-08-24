@@ -2,6 +2,7 @@
 using FinanceHub.Application.Common.Events;
 using FinanceHub.Application.Common.Outbox;
 using FinanceHub.Application.Interfaces.Cache;
+using FinanceHub.Application.Interfaces.Observability;
 using FinanceHub.Application.Interfaces.Repositories;
 using FinanceHub.Application.Interfaces.Services;
 using FinanceHub.Application.Requests;
@@ -34,7 +35,7 @@ public class CarteiraServiceTests
     private readonly CriarCarteiraRequestValidator _criarCarteiraValidator = new();
     private readonly Mock<ICacheService> _cacheService = new();
     private readonly Mock<ILogger<CarteiraService>> _logger = new();
-
+    private readonly Mock<ICompraMetrics> _compraMetrics = new();
 
     private readonly Guid _usuarioId = Guid.NewGuid();
 
@@ -63,7 +64,8 @@ public class CarteiraServiceTests
             _outboxRepository.Object,
             _criarCarteiraValidator,
             _cacheService.Object,
-            _logger.Object);
+            _logger.Object,
+            _compraMetrics.Object);
     }
 
     [Fact]
@@ -508,6 +510,10 @@ public class CarteiraServiceTests
 
         await act.Should()
             .ThrowAsync<CarteiraNaoEncontradaException>();
+
+        _compraMetrics.Verify(
+            x => x.CompraRealizada(),
+            Times.Never);
     }
 
     [Fact]
@@ -541,6 +547,10 @@ public class CarteiraServiceTests
 
         await act.Should()
             .ThrowAsync<CarteiraNaoPertenceAoUsuarioException>();
+
+        _compraMetrics.Verify(
+            x => x.CompraRealizada(),
+            Times.Never);
     }
 
     [Fact]
@@ -578,6 +588,10 @@ public class CarteiraServiceTests
 
         await act.Should()
             .ThrowAsync<AtivoNaoEncontradoException>();
+
+        _compraMetrics.Verify(
+            x => x.CompraRealizada(),
+            Times.Never);
     }
 
     [Fact]
@@ -645,6 +659,10 @@ public class CarteiraServiceTests
 
         _unitOfWork.Verify(
             x => x.CommitAsync(),
+            Times.Never);
+
+        _compraMetrics.Verify(
+            x => x.CompraRealizada(),
             Times.Never);
     }
 
@@ -736,6 +754,10 @@ public class CarteiraServiceTests
         _unitOfWork.Verify(
             x => x.RollbackAsync(),
             Times.Never);
+
+        _compraMetrics.Verify(
+            x => x.CompraRealizada(),
+            Times.Once);
     }
 
     [Fact]
@@ -806,6 +828,10 @@ public class CarteiraServiceTests
 
         _unitOfWork.Verify(
             x => x.CommitAsync(),
+            Times.Once);
+
+        _compraMetrics.Verify(
+            x => x.CompraRealizada(),
             Times.Once);
     }
 
@@ -1201,6 +1227,10 @@ public class CarteiraServiceTests
 
         _unitOfWork.Verify(
             x => x.RollbackAsync(),
+            Times.Never);
+
+        _compraMetrics.Verify(
+            x => x.CompraRealizada(),
             Times.Never);
     }
 }

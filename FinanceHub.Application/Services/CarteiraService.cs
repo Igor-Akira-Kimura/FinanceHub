@@ -3,6 +3,7 @@ using FinanceHub.Application.Common;
 using FinanceHub.Application.Common.Events;
 using FinanceHub.Application.Common.Outbox;
 using FinanceHub.Application.Interfaces.Cache;
+using FinanceHub.Application.Interfaces.Observability;
 using FinanceHub.Application.Interfaces.Repositories;
 using FinanceHub.Application.Interfaces.Services;
 using FinanceHub.Application.Requests;
@@ -11,8 +12,9 @@ using FinanceHub.Application.Responses;
 using FinanceHub.Domain.Entities;
 using FinanceHub.Domain.Exceptions;
 using FluentValidation;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
+using System.Text.Json;
 
 namespace FinanceHub.Application.Services
 {
@@ -32,7 +34,8 @@ namespace FinanceHub.Application.Services
         private readonly IValidator<CriarCarteiraRequest> _criarCarteiraValidator;
         private readonly ICacheService _cacheService;
         private readonly ILogger<CarteiraService> _logger;
-        public CarteiraService(ICarteiraRepository carteiraRepository, IUsuarioRepository usuarioRepository, IAtivoRepository ativoRepository, IPosicaoRepository posicaoRepository, IMovimentacaoRepository movimentacaoRepository, IValidator<ComprarAtivoRequest> comprarAtivoRequestValidator, IValidator<VenderAtivoRequest> venderAtivoRequestValidator, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICompraRepository compraRepository, IOutboxRepository outboxRepository, IValidator<CriarCarteiraRequest> criarCarteiraRequestValidator, ICacheService cacheService, ILogger<CarteiraService> logger)
+        private readonly ICompraMetrics _compraMetrics;
+        public CarteiraService(ICarteiraRepository carteiraRepository, IUsuarioRepository usuarioRepository, IAtivoRepository ativoRepository, IPosicaoRepository posicaoRepository, IMovimentacaoRepository movimentacaoRepository, IValidator<ComprarAtivoRequest> comprarAtivoRequestValidator, IValidator<VenderAtivoRequest> venderAtivoRequestValidator, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICompraRepository compraRepository, IOutboxRepository outboxRepository, IValidator<CriarCarteiraRequest> criarCarteiraRequestValidator, ICacheService cacheService, ILogger<CarteiraService> logger, ICompraMetrics compraMetrics)
         {
             _carteiraRepository = carteiraRepository;
             _usuarioRepository = usuarioRepository;
@@ -48,6 +51,7 @@ namespace FinanceHub.Application.Services
             _criarCarteiraValidator = criarCarteiraRequestValidator;
             _cacheService = cacheService;
             _logger = logger;
+            _compraMetrics = compraMetrics;
         }
 
         public async Task<Guid> CriarAsync(CriarCarteiraRequest request)
@@ -127,6 +131,8 @@ namespace FinanceHub.Application.Services
 
         public async Task ComprarAtivoAsync(ComprarAtivoRequest request)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             _logger.LogInformation(
                 "Iniciando compra. CarteiraId: {CarteiraId}, AtivoId: {AtivoId}, Quantidade: {Quantidade}",
                 request.CarteiraId,
@@ -290,6 +296,13 @@ namespace FinanceHub.Application.Services
                     .CriarAsync(outboxMessage);
 
                 await _unitOfWork.CommitAsync();
+
+                _compraMetrics.CompraRealizada();
+
+                stopwatch.Stop();
+
+                _compraMetrics.RegistrarDuracao(
+                    stopwatch.Elapsed.TotalMilliseconds);
 
                 _logger.LogInformation(
                     "Compra realizada. CarteiraId: {CarteiraId}, AtivoId: {AtivoId}, Quantidade: {Quantidade}",
