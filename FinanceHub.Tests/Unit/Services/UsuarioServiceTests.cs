@@ -8,7 +8,7 @@ using FluentAssertions;
 using FluentValidation;
 using Moq;
 
-namespace FinanceHub.Tests.Application.Services;
+namespace FinanceHub.Tests.Unit.Services;
 
 public class UsuarioServiceTests
 {

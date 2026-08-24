@@ -1,4 +1,5 @@
 ﻿using FinanceHub.Application.Common.Events;
+using FinanceHub.Application.Interfaces.Services;
 using FinanceHub.Application.Requests.Carteiras;
 using FinanceHub.Domain.Entities;
 using FinanceHub.Domain.Enums;
@@ -7,15 +8,11 @@ using FinanceHub.Tests.Fixtures;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Security.Claims;
-using System.Text;
 
-namespace FinanceHub.Tests.Integration;
+namespace FinanceHub.Tests.Integration.Concurrency;
 
 public class CompraConcurrencyTests
     : IClassFixture<DatabaseFixture>
@@ -72,8 +69,12 @@ public class CompraConcurrencyTests
         using var client =
             _factory.CreateClient();
 
+        var tokenService =
+            _factory.Services
+                .GetRequiredService<ITokenService>();
+
         var token =
-            GerarToken(usuario);
+            tokenService.GerarToken(usuario);
 
         client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue(
@@ -257,45 +258,5 @@ public class CompraConcurrencyTests
                 setters.SetProperty(
                     x => x.Saldo,
                     saldo));
-    }
-
-    private static string GerarToken(
-        Usuario usuario)
-    {
-        var claims = new[]
-        {
-            new Claim(
-                ClaimTypes.NameIdentifier,
-                usuario.Id.ToString()),
-
-            new Claim(
-                ClaimTypes.Name,
-                usuario.Nome),
-
-            new Claim(
-                ClaimTypes.Email,
-                usuario.Email)
-        };
-
-        var key =
-            new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(
-                    "SuaChaveSuperSecretaComNoMinimo32Caracteres123!"));
-
-        var credentials =
-            new SigningCredentials(
-                key,
-                SecurityAlgorithms.HmacSha256);
-
-        var token =
-            new JwtSecurityToken(
-                issuer: "FinanceHub.Api",
-                audience: "FinanceHub.Client",
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: credentials);
-
-        return new JwtSecurityTokenHandler()
-            .WriteToken(token);
     }
 }

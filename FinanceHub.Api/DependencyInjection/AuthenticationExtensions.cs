@@ -36,11 +36,31 @@ public static class AuthenticationExtensions
 
                         IssuerSigningKey =
                             new SymmetricSecurityKey(
-                                Encoding.UTF8.GetBytes(jwtSettings.Key)),
+                                Encoding.UTF8.GetBytes(
+                                    jwtSettings.Key)),
 
                         ClockSkew = TimeSpan.Zero
                     };
             });
+
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(
+                "AdminOnly",
+                policy =>
+                {
+                    policy.RequireRole("Admin");
+                });
+
+            options.AddPolicy(
+                "PodeComprarAtivos",
+                policy =>
+                {
+                    policy.RequireClaim(
+                        "permission",
+                        "ComprarAtivos");
+                });
+        });
 
         return services;
     }

@@ -51,6 +51,7 @@ namespace FinanceHub.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize(Policy = "PodeComprarAtivos")]
         [HttpPost("comprar")]
         public async Task<IActionResult> Comprar(ComprarAtivoRequest request)
         {

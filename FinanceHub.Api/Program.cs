@@ -17,22 +17,47 @@ public class Program
 
         builder.Services.AddHttpContextAccessor();
 
+        //// =========================================
+        //// REDIS
+        //// =========================================
+
+        //var redisConnectionString =
+        //    builder.Configuration[
+        //        "Redis:ConnectionString"]
+        //    ?? throw new InvalidOperationException(
+        //        "Redis:ConnectionString não configurada.");
+
+        //builder.Services.AddSingleton<IConnectionMultiplexer>(
+        //    ConnectionMultiplexer.Connect(
+        //        redisConnectionString));
+
+        //builder.Services.AddSingleton<ICacheService,
+        //    RedisCacheService>();
+
         // =========================================
-        // REDIS
+        // CACHE
         // =========================================
 
         var redisConnectionString =
             builder.Configuration[
-                "Redis:ConnectionString"]
-            ?? throw new InvalidOperationException(
-                "Redis:ConnectionString não configurada.");
+                "Redis:ConnectionString"];
 
-        builder.Services.AddSingleton<IConnectionMultiplexer>(
-            ConnectionMultiplexer.Connect(
-                redisConnectionString));
+        if (!string.IsNullOrWhiteSpace(redisConnectionString))
+        {
+            builder.Services.AddSingleton<IConnectionMultiplexer>(
+                ConnectionMultiplexer.Connect(
+                    redisConnectionString));
 
-        builder.Services.AddSingleton<ICacheService,
-            RedisCacheService>();
+            builder.Services.AddSingleton<ICacheService,
+                RedisCacheService>();
+        }
+        else
+        {
+            builder.Services.AddMemoryCache();
+
+            builder.Services.AddSingleton<ICacheService,
+                MemoryCacheService>();
+        }
 
         // =========================================
         // APPLICATION / INFRASTRUCTURE

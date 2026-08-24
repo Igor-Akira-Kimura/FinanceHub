@@ -1,4 +1,5 @@
-﻿using FinanceHub.Domain.Exceptions;
+﻿using FinanceHub.Domain.Enums;
+using FinanceHub.Domain.Exceptions;
 
 namespace FinanceHub.Domain.Entities
 {
@@ -20,6 +21,10 @@ namespace FinanceHub.Domain.Entities
 
         public ICollection<Carteira> Carteiras { get; private set; } = [];
 
+        public UsuarioRole Role { get; private set; }
+
+        public ICollection<RefreshToken> RefreshTokens { get; private set; } = [];
+
         public Usuario(string nome, string email, string senhaHash)
         {
             DefinirDados(nome, email);
@@ -31,6 +36,7 @@ namespace FinanceHub.Domain.Entities
             SenhaHash = senhaHash;
             Ativo = true;
             DataCriacao = DateTime.UtcNow;
+            Role = UsuarioRole.User;
         }
 
         public void Atualizar(string nome, string email)

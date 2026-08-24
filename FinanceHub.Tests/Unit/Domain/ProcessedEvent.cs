@@ -1,7 +1,7 @@
 ﻿using FinanceHub.Domain.Entities;
 using FluentAssertions;
 
-namespace FinanceHub.Tests.Domain;
+namespace FinanceHub.Tests.Unit.Domain;
 
 public class ProcessedEventTests
 {

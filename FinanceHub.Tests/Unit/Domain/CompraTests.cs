@@ -6,7 +6,7 @@ using FluentAssertions;
 using Moq;
 using System.Runtime.ConstrainedExecution;
 
-namespace FinanceHub.Tests.Domain;
+namespace FinanceHub.Tests.Unit.Domain;
 
 public class CompraTests
 {
