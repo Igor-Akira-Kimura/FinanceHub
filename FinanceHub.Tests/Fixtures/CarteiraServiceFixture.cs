@@ -1,15 +1,17 @@
-﻿using FinanceHub.Application.Common;
-using FinanceHub.Application.Requests.Carteiras;
-using FinanceHub.Domain.Entities;
+﻿using Castle.Core.Logging;
+using FinanceHub.Application.Common;
+using FinanceHub.Application.Interfaces.Cache;
 using FinanceHub.Application.Interfaces.Repositories;
 using FinanceHub.Application.Interfaces.Services;
 using FinanceHub.Application.Requests;
+using FinanceHub.Application.Requests.Carteiras;
 using FinanceHub.Application.Services;
+using FinanceHub.Domain.Entities;
 using FinanceHub.Tests.Builders;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.Extensions.Logging;
 using Moq;
-using FinanceHub.Application.Interfaces.Cache;
 
 namespace FinanceHub.Tests.Fixtures;
 
@@ -41,6 +43,8 @@ public class CarteiraServiceFixture
 
     public Mock<ICacheService> CacheService { get; } = new();
 
+    public Mock<ILogger<CarteiraService>> _logger = new();
+
     public CarteiraService Service { get; }
 
     public CarteiraServiceFixture()
@@ -58,7 +62,8 @@ public class CarteiraServiceFixture
             CompraRepository.Object,
             OutboxRepository.Object,
             CriarCarteiraValidator.Object,
-            CacheService.Object);
+            CacheService.Object,
+            _logger.Object);
 
         ComprarValidator
             .Setup(x => x.ValidateAsync(

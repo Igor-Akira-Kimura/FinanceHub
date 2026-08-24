@@ -1,5 +1,6 @@
 using FinanceHub.Api.DependencyInjection;
 using FinanceHub.Api.ExceptionHandling;
+using FinanceHub.Api.Middleware;
 using FinanceHub.Application.Interfaces.Cache;
 using FinanceHub.Infrastructure.Cache;
 using StackExchange.Redis;
@@ -74,6 +75,8 @@ public class Program
             .AddHealthChecks();
 
         var app = builder.Build();
+
+        app.UseMiddleware<CorrelationIdMiddleware>();
 
         app.UseMiddleware<ExceptionMiddleware>();
 

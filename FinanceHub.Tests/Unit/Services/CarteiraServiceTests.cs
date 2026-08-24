@@ -13,6 +13,7 @@ using FinanceHub.Domain.Enums;
 using FinanceHub.Domain.Exceptions;
 using FluentAssertions;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace FinanceHub.Tests.Unit.Services;
@@ -32,6 +33,9 @@ public class CarteiraServiceTests
     private readonly Mock<IOutboxRepository> _outboxRepository = new();
     private readonly CriarCarteiraRequestValidator _criarCarteiraValidator = new();
     private readonly Mock<ICacheService> _cacheService = new();
+    private readonly Mock<ILogger<CarteiraService>> _logger = new();
+
+
     private readonly Guid _usuarioId = Guid.NewGuid();
 
     private CarteiraService CriarService()
@@ -58,7 +62,8 @@ public class CarteiraServiceTests
             _compraRepository.Object,
             _outboxRepository.Object,
             _criarCarteiraValidator,
-            _cacheService.Object);
+            _cacheService.Object,
+            _logger.Object);
     }
 
     [Fact]

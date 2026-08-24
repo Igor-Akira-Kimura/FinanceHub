@@ -12,6 +12,7 @@ using FinanceHub.Domain.Entities;
 using FinanceHub.Domain.Exceptions;
 using FluentValidation;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
 namespace FinanceHub.Application.Services
 {
@@ -30,8 +31,8 @@ namespace FinanceHub.Application.Services
         private readonly IOutboxRepository _outboxRepository;
         private readonly IValidator<CriarCarteiraRequest> _criarCarteiraValidator;
         private readonly ICacheService _cacheService;
-
-        public CarteiraService(ICarteiraRepository carteiraRepository, IUsuarioRepository usuarioRepository, IAtivoRepository ativoRepository, IPosicaoRepository posicaoRepository, IMovimentacaoRepository movimentacaoRepository, IValidator<ComprarAtivoRequest> comprarAtivoRequestValidator, IValidator<VenderAtivoRequest> venderAtivoRequestValidator, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICompraRepository compraRepository, IOutboxRepository outboxRepository, IValidator<CriarCarteiraRequest> criarCarteiraRequestValidator, ICacheService cacheService)
+        private readonly ILogger<CarteiraService> _logger;
+        public CarteiraService(ICarteiraRepository carteiraRepository, IUsuarioRepository usuarioRepository, IAtivoRepository ativoRepository, IPosicaoRepository posicaoRepository, IMovimentacaoRepository movimentacaoRepository, IValidator<ComprarAtivoRequest> comprarAtivoRequestValidator, IValidator<VenderAtivoRequest> venderAtivoRequestValidator, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, ICompraRepository compraRepository, IOutboxRepository outboxRepository, IValidator<CriarCarteiraRequest> criarCarteiraRequestValidator, ICacheService cacheService, ILogger<CarteiraService> logger)
         {
             _carteiraRepository = carteiraRepository;
             _usuarioRepository = usuarioRepository;
@@ -46,6 +47,7 @@ namespace FinanceHub.Application.Services
             _outboxRepository = outboxRepository;
             _criarCarteiraValidator = criarCarteiraRequestValidator;
             _cacheService = cacheService;
+            _logger = logger;
         }
 
         public async Task<Guid> CriarAsync(CriarCarteiraRequest request)
@@ -125,6 +127,12 @@ namespace FinanceHub.Application.Services
 
         public async Task ComprarAtivoAsync(ComprarAtivoRequest request)
         {
+            _logger.LogInformation(
+                "Iniciando compra. CarteiraId: {CarteiraId}, AtivoId: {AtivoId}, Quantidade: {Quantidade}",
+                request.CarteiraId,
+                request.AtivoId,
+                request.Quantidade);
+
             await _comprarValidator
                 .ValidateAndThrowAsync(request);
 
@@ -134,6 +142,10 @@ namespace FinanceHub.Application.Services
             if (carteira is null)
                 throw new CarteiraNaoEncontradaException(
                     request.CarteiraId);
+
+            _logger.LogDebug(
+                "Carteira encontrada. CarteiraId: {CarteiraId}",
+                carteira.Id);
 
             if (carteira.UsuarioId != _currentUserService.Usuario.Id)
                 throw new CarteiraNaoPertenceAoUsuarioException(
@@ -148,8 +160,9 @@ namespace FinanceHub.Application.Services
 
             if (cachedPreco is not null)
             {
-                Console.WriteLine(
-                    $"CACHE HIT: {cacheKey}");
+                _logger.LogDebug(
+                    "Cache hit. CacheKey: {CacheKey}",
+                    cacheKey);
 
                 preco =
                     JsonSerializer
@@ -159,8 +172,9 @@ namespace FinanceHub.Application.Services
             }
             else
             {
-                Console.WriteLine(
-                    $"CACHE MISS: {cacheKey}");
+                _logger.LogDebug(
+                    "Cache miss. CacheKey: {CacheKey}",
+                    cacheKey);
 
                 var ativo =
                     await _ativoRepository
@@ -169,6 +183,10 @@ namespace FinanceHub.Application.Services
                 if (ativo is null)
                     throw new AtivoNaoEncontradoException(
                         request.AtivoId);
+
+                _logger.LogDebug(
+                    "Ativo encontrado. AtivoId: {AtivoId}",
+                    ativo.Id);
 
                 preco = ativo.Preco;
 
@@ -272,6 +290,12 @@ namespace FinanceHub.Application.Services
                     .CriarAsync(outboxMessage);
 
                 await _unitOfWork.CommitAsync();
+
+                _logger.LogInformation(
+                    "Compra realizada. CarteiraId: {CarteiraId}, AtivoId: {AtivoId}, Quantidade: {Quantidade}",
+                    request.CarteiraId,
+                    request.AtivoId,
+                    request.Quantidade);
             }
             catch (IdempotencyKeyJaProcessadaException)
             {
