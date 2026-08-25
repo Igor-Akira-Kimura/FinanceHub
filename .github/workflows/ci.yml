@@ -111,6 +111,8 @@ jobs:
         env:
           TEST_DATABASE_CONNECTION_STRING: "Server=localhost,1433;Database=FinanceHubTestDb;User Id=sa;Password=${{ secrets.SQL_PASSWORD }};TrustServerCertificate=True;"
 
+          Jwt__Key: ${{ secrets.JWT_KEY }}
+
           Redis__ConnectionString: "localhost:6379"
 
           RABBITMQ_HOST: "localhost"
