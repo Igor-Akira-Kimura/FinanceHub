@@ -45,6 +45,11 @@ jobs:
       # =========================================
 
       - name: Start infrastructure
+        env:
+          SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+          RABBITMQ_USERNAME: ${{ secrets.RABBITMQ_USERNAME }}
+          RABBITMQ_PASSWORD: ${{ secrets.RABBITMQ_PASSWORD }}
         run: docker compose up -d --build
 
       - name: Show containers
@@ -104,13 +109,15 @@ jobs:
 
       - name: Test
         env:
-          TEST_DATABASE_CONNECTION_STRING: "Server=localhost,1433;Database=FinanceHubTestDb;User Id=sa;Password=FinanceHub@123;TrustServerCertificate=True;"
+          TEST_DATABASE_CONNECTION_STRING: "Server=localhost,1433;Database=FinanceHubTestDb;User Id=sa;Password=${{ secrets.SQL_PASSWORD }};TrustServerCertificate=True;"
+
+          Jwt__Key: ${{ secrets.JWT_KEY }}
 
           Redis__ConnectionString: "localhost:6379"
 
           RABBITMQ_HOST: "localhost"
-          RABBITMQ_USERNAME: "guest"
-          RABBITMQ_PASSWORD: "guest"
+          RABBITMQ_USERNAME: "${{ secrets.RABBITMQ_USERNAME }}"
+          RABBITMQ_PASSWORD: "${{ secrets.RABBITMQ_PASSWORD }}"
 
         run: dotnet test --no-build --configuration Release
 
