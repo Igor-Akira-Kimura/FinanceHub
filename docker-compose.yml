@@ -13,10 +13,13 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
 
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=FinanceHubDb;User Id=sa;Password=${SQL_PASSWORD};TrustServerCertificate=True;"
+      OTEL_SERVICE_NAME: "financehub-api"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4317"
 
       Jwt__Key: "${JWT_KEY}"
 
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=FinanceHubDb;User Id=sa;Password=${SQL_PASSWORD};TrustServerCertificate=True;"
+      
       Redis__ConnectionString: "redis:6379"
 
     depends_on:
@@ -153,6 +156,17 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
+
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+
+    container_name: financehub-jaeger
+
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
 
 
 volumes:
