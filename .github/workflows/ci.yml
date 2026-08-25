@@ -182,10 +182,14 @@ jobs:
         run: docker pull ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/financehub-api:${GITHUB_SHA}
 
       - name: Run Docker Container
+        env:
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+
         run: |
           docker run -d \
             --name financehub-api \
             -p 8080:8080 \
+            -e Jwt__Key="$JWT_KEY" \
             ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/financehub-api:${GITHUB_SHA}
 
       - name: Health Check
