@@ -6,6 +6,7 @@ using FinanceHub.Application.Interfaces.Cache;
 using FinanceHub.Application.Interfaces.Observability;
 using FinanceHub.Application.Interfaces.Repositories;
 using FinanceHub.Application.Interfaces.Services;
+using FinanceHub.Application.Observability;
 using FinanceHub.Application.Requests;
 using FinanceHub.Application.Requests.Carteiras;
 using FinanceHub.Application.Responses;
@@ -131,7 +132,7 @@ namespace FinanceHub.Application.Services
 
         public async Task ComprarAtivoAsync(ComprarAtivoRequest request)
         {
-            var stopwatch = Stopwatch.StartNew();
+            var inicio = Stopwatch.GetTimestamp();
 
             _logger.LogInformation(
                 "Iniciando compra. CarteiraId: {CarteiraId}, AtivoId: {AtivoId}, Quantidade: {Quantidade}",
@@ -299,11 +300,6 @@ namespace FinanceHub.Application.Services
 
                 _compraMetrics.CompraRealizada();
 
-                stopwatch.Stop();
-
-                _compraMetrics.RegistrarDuracao(
-                    stopwatch.Elapsed.TotalMilliseconds);
-
                 _logger.LogInformation(
                     "Compra realizada. CarteiraId: {CarteiraId}, AtivoId: {AtivoId}, Quantidade: {Quantidade}",
                     request.CarteiraId,
@@ -319,6 +315,14 @@ namespace FinanceHub.Application.Services
             {
                 await _unitOfWork.RollbackAsync();
                 throw;
+            }
+            finally
+            {
+                var duracao =
+                    Stopwatch.GetElapsedTime(inicio);
+
+                _compraMetrics.RegistrarDuracao(
+                    duracao.TotalMilliseconds);
             }
         }
 

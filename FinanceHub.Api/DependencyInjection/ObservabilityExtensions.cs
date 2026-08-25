@@ -1,6 +1,7 @@
 ﻿using FinanceHub.Application.Interfaces.Observability;
 using FinanceHub.Infrastructure.Observability;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 
 namespace FinanceHub.Api.DependencyInjection;
 
@@ -13,6 +14,11 @@ public static class ObservabilityExtensions
 
         services
             .AddOpenTelemetry()
+
+            // =========================================
+            // METRICS
+            // =========================================
+
             .WithMetrics(metrics =>
             {
                 metrics
@@ -20,6 +26,19 @@ public static class ObservabilityExtensions
                     .AddAspNetCoreInstrumentation()
                     .AddRuntimeInstrumentation()
                     .AddPrometheusExporter();
+            })
+
+            // =========================================
+            // TRACING
+            // =========================================
+
+            .WithTracing(tracing =>
+            {
+                tracing
+                    .AddSource("FinanceHub")
+                    .AddAspNetCoreInstrumentation()
+                    .AddSqlClientInstrumentation()
+                    .AddOtlpExporter();
             });
 
         return services;

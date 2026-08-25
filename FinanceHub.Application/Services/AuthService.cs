@@ -4,6 +4,7 @@ using FinanceHub.Domain.Exceptions;
 using FinanceHub.Application.Interfaces.Repositories;
 using FinanceHub.Application.Interfaces.Services;
 using FluentValidation;
+using FinanceHub.Application.Observability;
 
 namespace FinanceHub.Application.Services;
 
@@ -44,15 +45,27 @@ public class AuthService : IAuthService
         if (!usuario.Ativo)
             throw new CredenciaisInvalidasException();
 
-        if (!_passwordHasher.Verify(
+        using (var activity =
+            FinanceHubActivitySource.Instance
+                .StartActivity("Verificar senha"))
+        {
+            if (!_passwordHasher.Verify(
                 request.Senha,
                 usuario.SenhaHash))
-        {
-            throw new CredenciaisInvalidasException();
+            {
+                throw new CredenciaisInvalidasException();
+            }
         }
 
-        var accessToken =
-            _tokenService.GerarToken(usuario);
+        string accessToken;
+
+        using (var activity =
+            FinanceHubActivitySource.Instance
+                .StartActivity("Gerar JWT"))
+        {
+            accessToken =
+                _tokenService.GerarToken(usuario);
+        }
 
         var refreshToken =
             await _refreshTokenService
