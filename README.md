@@ -1,50 +1,49 @@
 # FinanceHub
 
-Backend de uma plataforma de gestão financeira desenvolvida com C# e
-ASP.NET Core, aplicando princípios de arquitetura de software,
-separação de responsabilidades, testes automatizados, mensageria,
-processamento assíncrono, containers e CI/CD.
+Backend de uma plataforma de gestão financeira desenvolvida com C# e ASP.NET Core, aplicando conceitos de arquitetura, DDD, SOLID, mensageria, processamento assíncrono, testes automatizados, Docker, CI/CD e Cloud.
 
 ## Tecnologias
 
 ### Backend
-
 - C#
 - .NET 9
 - ASP.NET Core
 - Entity Framework Core
 - FluentValidation
-- JWT
 - LINQ
 
 ### Banco de dados
-
 - SQL Server
+- Entity Framework Core Migrations
 
 ### Mensageria e processamento assíncrono
-
 - RabbitMQ
 - Outbox Pattern
 - Workers
+- Idempotência
+
+### Cache
+- Redis
 
 ### Testes
-
 - xUnit
 - Testes unitários
 - Testes de integração
 
-### Infraestrutura
-
+### Infraestrutura e Cloud
 - Docker
 - Docker Compose
 - GitHub Actions
 - GitHub Container Registry
-- AWS
+- AWS EC2
+- AWS RDS
+- AWS VPC
+- AWS Security Groups
+- Ubuntu Server
 
 ## Arquitetura
 
-O projeto utiliza uma arquitetura baseada na separação de responsabilidades
-entre apresentação, aplicação, domínio e infraestrutura.
+O projeto utiliza separação de responsabilidades entre API, aplicação, domínio e infraestrutura.
 
 ```text
 FinanceHub
@@ -58,160 +57,125 @@ FinanceHub
 └── FinanceHub.Tests
 
 FinanceHub.Api
-
-Responsável pela exposição da API HTTP e pela entrada das requisições
-da aplicação.
-
-Responsabilidades:
-
 Controllers
 Autenticação e autorização
-Configuração da aplicação
+JWT
 Health Checks
 Middleware
+Exception Handling
+Observabilidade
 FinanceHub.Application
-
-Responsável pelos casos de uso e pela lógica de aplicação.
-
-Responsabilidades:
-
 Casos de uso
 DTOs
 Validações
 Interfaces
 Orquestração das operações
 FinanceHub.Domain
-
-Contém o núcleo do domínio e as regras de negócio.
-
-Responsabilidades:
-
 Entidades
 Value Objects
 Regras de negócio
 Exceções de domínio
 FinanceHub.Infrastructure
-
-Responsável pelas integrações com recursos externos.
-
-Responsabilidades:
-
 Entity Framework Core
 SQL Server
+Redis
 Repositórios
+RabbitMQ
+BCrypt
 Persistência
-Mensageria
-Workers
-
-O projeto possui workers separados para processamento assíncrono.
-
-FinanceHub.Carteira.Worker
-FinanceHub.Outbox.Worker
-
-Esses processos permitem retirar determinadas tarefas do fluxo
-síncrono da API e realizar seu processamento em background.
-
 Funcionalidades
-Autenticação utilizando JWT
+Autenticação com JWT
+Refresh Token
 Gerenciamento de usuários
 Gerenciamento de carteiras
 Gerenciamento de ativos
-Compra de ativos
-Venda de ativos
+Compra e venda de ativos
 Validação das operações
 Persistência em SQL Server
-Processamento assíncrono
+Cache com Redis
 Mensageria com RabbitMQ
-Processamento de eventos através de workers
-Outbox
+Processamento assíncrono
+Outbox Pattern
+Idempotência
 Health Checks
-Logs
+Correlation ID
 Testes automatizados
-Segurança
+Cloud / Deploy
 
-A API utiliza autenticação baseada em JSON Web Token (JWT).
+A aplicação foi implantada na AWS utilizando EC2 para execução da API e RDS para o banco SQL Server.
 
-As requisições protegidas precisam apresentar um token válido para
-acessar os recursos que exigem autenticação.
+                 AWS
+                  │
+        ┌─────────┴─────────┐
+        │                   │
+       EC2                 RDS
+    Ubuntu + Docker      SQL Server
+        │                   │
+        └──── FinanceHub ───┘
+                 API
 
-Mensageria e processamento assíncrono
+O ambiente foi validado com:
 
-O RabbitMQ é utilizado para comunicação assíncrona entre componentes
-da aplicação.
-
-A utilização de workers permite que tarefas que não precisam ser
-executadas diretamente durante a requisição HTTP sejam processadas
-separadamente.
-
-Essa abordagem reduz o acoplamento entre a API e processos assíncronos
-e permite maior controle sobre o processamento das mensagens.
-
-Outbox
-
-O projeto possui um worker dedicado ao processamento da Outbox.
-
-A abordagem permite separar o registro dos eventos da publicação e
-processamento assíncrono, aumentando a confiabilidade da comunicação
-entre os componentes.
-
-Testes
-
-O projeto possui uma suíte de testes automatizados.
-
-Os testes são executados durante o pipeline de CI e incluem testes
-das regras de negócio e testes de integração.
-
-Docker
-
-O projeto utiliza Docker para padronizar o ambiente de execução.
-
-Também possui Docker Compose para facilitar a execução dos serviços
-necessários ao ambiente local.
-
-docker compose up -d
+API executando em Docker na EC2
+SQL Server hospedado no RDS
+Entity Framework Core Migrations aplicadas no RDS
+Comunicação EC2 → RDS
+Autenticação JWT
+Acesso externo à API através do Security Group
+Health Check funcionando externamente
 CI/CD
 
-O projeto utiliza GitHub Actions para automatizar o processo de
-integração e entrega.
+O pipeline utiliza GitHub Actions para:
 
-O pipeline realiza:
-
-Checkout do código
-Configuração do ambiente .NET
 Restore das dependências
-Build da solução
+Build
 Execução dos testes
 Build da imagem Docker
-Publicação da imagem no GitHub Container Registry
-Execução da imagem Docker no ambiente de deploy
+Publicação no GitHub Container Registry
+Deploy da aplicação
+
+Fluxo:
+
+GitHub
+   ↓
+GitHub Actions
+   ↓
+Build + Test
+   ↓
+Docker Build
+   ↓
+GitHub Container Registry
+   ↓
+AWS EC2
+   ↓
+FinanceHub API
+Docker
+
+Para executar o ambiente local:
+
+docker compose up -d
 Health Check
-
-A aplicação possui um endpoint de Health Check para verificar
-a disponibilidade da API.
-
-Exemplo:
-
 GET /health
-Objetivo do projeto
 
-O FinanceHub foi desenvolvido para aplicar, em um projeto backend
-completo, conceitos utilizados no desenvolvimento profissional de
-software.
+Endpoint utilizado para verificar a disponibilidade da API.
 
-Entre os principais conceitos aplicados estão:
+Objetivo
+
+Projeto desenvolvido para praticar conceitos utilizados no desenvolvimento profissional de aplicações backend, incluindo:
 
 Clean Architecture
 DDD
 SOLID
 APIs REST
-Autenticação JWT
+JWT
 Entity Framework Core
 SQL Server
-Mensageria
-Processamento assíncrono
+Redis
+RabbitMQ
 Outbox Pattern
+Idempotência
 Testes automatizados
 Docker
 CI/CD
-GitHub Actions
-Observabilidade básica
+AWS
+Observabilidade
