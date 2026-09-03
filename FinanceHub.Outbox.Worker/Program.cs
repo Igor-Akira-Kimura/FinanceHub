@@ -1,3 +1,4 @@
+using Amazon.SQS;
 using FinanceHub.Application.Interfaces.Repositories;
 using FinanceHub.Infrastructure.Data;
 using FinanceHub.Infrastructure.Repositories;
@@ -20,9 +21,16 @@ namespace FinanceHub.Outbox.Worker
 
             builder.Services.AddScoped<IOutboxRepository, OutboxRepository>();
 
-            builder.Services.AddSingleton<IEventPublisher, RabbitMqEventPublisher>();
+            //builder.Services.AddSingleton<IEventPublisher, RabbitMqEventPublisher>();
+
+            builder.Services.AddSingleton<IEventPublisher, SqsEventPublisher>();
 
             builder.Services.AddHostedService<Worker>();
+
+            builder.Services.AddDefaultAWSOptions(
+                builder.Configuration.GetAWSOptions());
+
+            builder.Services.AddAWSService<IAmazonSQS>();
 
             var host = builder.Build();
 

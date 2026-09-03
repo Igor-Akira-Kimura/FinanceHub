@@ -4,9 +4,9 @@ namespace FinanceHub.Carteira.Worker
 {
     public class Worker : BackgroundService
     {
-        private readonly IRabbitMqConsumer _consumer;
+        private readonly IMessageConsumer _consumer;
 
-        public Worker(IRabbitMqConsumer consumer)
+        public Worker(IMessageConsumer consumer)
         {
             _consumer = consumer;
         }

@@ -95,6 +95,12 @@ services:
       RabbitMq__HostName: "rabbitmq"
       RabbitMq__UserName: "${RABBITMQ_USERNAME}"
       RabbitMq__Password: "${RABBITMQ_PASSWORD}"
+      AWS_PROFILE: default
+      AWS__Region: us-east-1
+      SQS__QueueUrl: "https://sqs.us-east-1.amazonaws.com/116622473866/compras-queue"
+
+    volumes:
+      - ${USERPROFILE}/.aws:/root/.aws:ro
 
     depends_on:
       sqlserver:
@@ -115,7 +121,13 @@ services:
       RabbitMq__HostName: "rabbitmq"
       RabbitMq__UserName: "${RABBITMQ_USERNAME}"
       RabbitMq__Password: "${RABBITMQ_PASSWORD}"
+      AWS_PROFILE: default
+      AWS__Region: us-east-1
+      SQS__QueueUrl: "https://sqs.us-east-1.amazonaws.com/116622473866/compras-queue"
 
+    volumes:
+      - ${USERPROFILE}/.aws:/root/.aws:ro
+    
     depends_on:
       sqlserver:
         condition: service_healthy
