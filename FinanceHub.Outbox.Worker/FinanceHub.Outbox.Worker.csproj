@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.101.1" />
+    <PackageReference Include="AWSSDK.SQS" Version="4.0.100.11" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.19" />
     <PackageReference Include="RabbitMQ.Client" Version="7.2.2" />
   </ItemGroup>

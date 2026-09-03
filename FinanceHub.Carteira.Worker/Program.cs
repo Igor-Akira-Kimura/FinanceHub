@@ -1,3 +1,4 @@
+using Amazon.SQS;
 using FinanceHub.Application.Interfaces.Repositories;
 using FinanceHub.Carteira.Worker.Messaging;
 using FinanceHub.Infrastructure.Data;
@@ -19,13 +20,18 @@ namespace FinanceHub.Carteira.Worker
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-            builder.Services.AddSingleton<
-                IRabbitMqConsumer,
-                RabbitMqConsumer>();
+            //builder.Services.AddSingleton<IRabbitMqConsumer, RabbitMqConsumer>();
+
+            builder.Services.AddSingleton<IMessageConsumer, SqsConsumer>();
 
             builder.Services.AddScoped<
                 IProcessedEventRepository,
                 ProcessedEventRepository>();
+
+            builder.Services.AddDefaultAWSOptions(
+            builder.Configuration.GetAWSOptions());
+
+            builder.Services.AddAWSService<IAmazonSQS>();
 
             builder.Services.AddHostedService<Worker>();
 
